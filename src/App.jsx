@@ -22,11 +22,11 @@ const PROFILE = {
   // for the exact filenames expected. If a file is missing, the bracket
   // code shows instead so nothing breaks.
   links: [
-    { code: 'IG', label: 'Instagram', href: 'https://instagram.com/yourusername', icon: '/logos/instagram.svg' },
-    { code: 'ST', label: 'Strava', href: 'https://strava.com/athletes/yourid', icon: '/logos/strava.svg' },
-    { code: 'BS', label: 'Brawl Stars', href: 'https://brawlify.com/stats/profile/yourtag', icon: '/logos/brawlstars.svg' },
-    { code: 'AN', label: 'Athletic.net', href: 'https://www.athletic.net/athlete/yourid', icon: '/logos/athleticnet.svg' },
-    { code: 'GM', label: 'Gmail', href: 'mailto:you@gmail.com', icon: '/logos/gmail.svg' },
+    { code: 'IG', label: 'Instagram', href: 'https://instagram.com/yourusername', icon: '/logos/instagram.jpeg' },
+    { code: 'ST', label: 'Strava', href: 'https://strava.com/athletes/yourid', icon: '/logos/strava.jpeg' },
+    { code: 'BS', label: 'Brawl Stars', href: 'https://brawlify.com/stats/profile/yourtag', icon: '/logos/brawl.jpeg' },
+    { code: 'AN', label: 'Athletic.net', href: 'https://www.athletic.net/athlete/yourid', icon: '/logos/athletic.jpeg' },
+    { code: 'GM', label: 'Gmail', href: 'mailto:you@gmail.com', icon: '/logos/gmail.jpeg' },
   ],
 }
 
