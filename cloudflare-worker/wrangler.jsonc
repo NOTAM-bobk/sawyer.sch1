@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "sawyer-view-counter",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-14",
+  "kv_namespaces": [
+    {
+      "binding": "VIEWS",
+      "id": "PASTE_YOUR_VIEWS_KV_NAMESPACE_ID_HERE"
+    },
+    {
+      "binding": "COMMENTS",
+      "id": "PASTE_YOUR_COMMENTS_KV_NAMESPACE_ID_HERE"
+    }
+  ]
+}
