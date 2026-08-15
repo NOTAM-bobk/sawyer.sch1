@@ -45,6 +45,13 @@ a {
   text-decoration: none;
 }
 
+a,
+button,
+input,
+textarea {
+  touch-action: manipulation;
+}
+
 /* -------------------------------------------------------------------- */
 /* Custom cursor                                                        */
 /* -------------------------------------------------------------------- */
@@ -169,8 +176,10 @@ body.cursor-none * {
 /* -------------------------------------------------------------------- */
 
 .content {
+  /* Above the animal companion (z-index: 5) so taps on real content always
+     win, even on touch devices where pointer-events alone isn't enough. */
   position: relative;
-  z-index: 2;
+  z-index: 6;
   max-width: 780px;
   margin: 0 auto;
   padding: 96px 24px 64px;
@@ -861,4 +870,215 @@ body.cursor-none * {
 
 .animal-companion canvas {
   pointer-events: none;
+}
+
+/* -------------------------------------------------------------------- */
+/* 3D companion toggle                                                  */
+/* -------------------------------------------------------------------- */
+
+.fx-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(244, 239, 228, 0.85);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 10px 6px 12px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  font-family: var(--font-mono);
+  transition: border-color 0.15s ease;
+}
+
+.fx-toggle:hover {
+  border-color: var(--accent-ink);
+}
+
+.fx-toggle-label {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.fx-toggle-track {
+  width: 30px;
+  height: 17px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  position: relative;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.fx-toggle[aria-checked='true'] .fx-toggle-track {
+  background: var(--accent);
+  border-color: var(--accent-ink);
+}
+
+.fx-toggle-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--ink);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.fx-toggle[aria-checked='true'] .fx-toggle-thumb {
+  transform: translateX(13px);
+  background: var(--bg);
+}
+
+@media (max-width: 640px) {
+  .fx-toggle {
+    bottom: 58px;
+    right: 14px;
+  }
+}
+
+/* -------------------------------------------------------------------- */
+/* Ambient quote whisper                                                */
+/* -------------------------------------------------------------------- */
+
+.quote-whisper {
+  position: fixed;
+  left: 24px;
+  bottom: 60px;
+  z-index: 1;
+  max-width: 260px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.quote-whisper-typing,
+.quote-whisper-holding {
+  opacity: 1;
+}
+
+.quote-whisper-fading {
+  opacity: 0;
+}
+
+.quote-whisper-typing::after,
+.quote-whisper-holding::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 10px;
+  margin-left: 2px;
+  background: var(--ink-faint);
+  vertical-align: -1px;
+  animation: quote-blink 1s steps(1) infinite;
+}
+
+@keyframes quote-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .quote-whisper {
+    left: 18px;
+    bottom: 54px;
+    max-width: 190px;
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quote-whisper {
+    display: none;
+  }
+}
+
+/* -------------------------------------------------------------------- */
+/* Hand-drawn doodles                                                    */
+/* -------------------------------------------------------------------- */
+
+.doodle {
+  display: block;
+  overflow: visible;
+}
+
+.headline-squiggle {
+  width: 120px;
+  height: 14px;
+  margin-top: 6px;
+  color: var(--accent-ink);
+}
+
+.cta-squiggle {
+  width: 100px;
+  height: 12px;
+  margin: 0 auto 10px;
+  color: var(--ink-faint);
+}
+
+.links-intro-smiley {
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  color: var(--accent-ink);
+  flex-shrink: 0;
+}
+
+/* -------------------------------------------------------------------- */
+/* "Follow me. or not" links intro                                      */
+/* -------------------------------------------------------------------- */
+
+.links-intro {
+  margin: 0 0 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2.6vw, 22px);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.links-intro-soft {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--ink-faint);
+}
+
+/* -------------------------------------------------------------------- */
+/* Scroll reveal                                                         */
+/* -------------------------------------------------------------------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
