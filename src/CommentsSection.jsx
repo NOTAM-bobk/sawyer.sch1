@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 // Point this at your deployed Cloudflare Worker's /comments route (see
 // cloudflare-worker/README.md). Leave blank to hide the whole feature.
-export const COMMENTS_API_URL = ''
+export const COMMENTS_API_URL = 'https://sawyer-view-counter.sawyerbobk563.workers.dev/comments'
 
 const VISIBLE_COUNT = 5
 
