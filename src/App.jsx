@@ -61,6 +61,17 @@ const PROJECTS = [
 // Point this at your deployed Cloudflare Worker (see cloudflare-worker/README.md).
 // Leave blank to hide the view counter.
 const VIEW_COUNTER_URL = 'https://sawyer-view-counter.sawyerbobk563.workers.dev/view'
+
+// Small ambient lines that occasionally type themselves out in the
+// background, then fade away. Purely decorative. Add as many as you want —
+// just drop another string in the array, nothing else to configure.
+const QUOTES = [
+  'small steps still count',
+  'chase splits, not perfection',
+  'code, run, repeat',
+  'do it scared',
+  'progress over perfect',
+]
 // ---------------------------------------------------------------------------
 
 function DotGrid() {
@@ -281,6 +292,162 @@ function CustomCursor() {
   )
 }
 
+// Small pill switch, fixed in the corner, that lets you turn the 3D
+// companion off — handy on lower-end phones or if it's just in the way.
+function FxToggle({ enabled, onToggle }) {
+  return (
+    <button
+      type="button"
+      className="fx-toggle"
+      role="switch"
+      aria-checked={enabled}
+      aria-label="Toggle 3D companion"
+      onClick={onToggle}
+    >
+      <span className="fx-toggle-label">3D</span>
+      <span className="fx-toggle-track">
+        <span className="fx-toggle-thumb" />
+      </span>
+    </button>
+  )
+}
+
+// Ambient background text: every so often it types out a short line, holds
+// it for a beat, then fades away. Sits behind the content and never
+// captures clicks.
+function QuoteWhisper({ quotes }) {
+  const [text, setText] = useState('')
+  const [phase, setPhase] = useState('idle') // idle | typing | holding | fading
+
+  useEffect(() => {
+    if (!quotes || quotes.length === 0) return
+    let cancelled = false
+    let typeTimer = null
+    let phaseTimer = null
+
+    function runCycle() {
+      if (cancelled) return
+      const quote = quotes[Math.floor(Math.random() * quotes.length)]
+      setPhase('typing')
+      setText('')
+      let i = 0
+      typeTimer = setInterval(() => {
+        if (cancelled) return
+        i += 1
+        setText(quote.slice(0, i))
+        if (i >= quote.length) {
+          clearInterval(typeTimer)
+          setPhase('holding')
+          phaseTimer = setTimeout(() => {
+            if (cancelled) return
+            setPhase('fading')
+            phaseTimer = setTimeout(() => {
+              if (cancelled) return
+              setPhase('idle')
+              setText('')
+              // Not that often — next line shows up in ~18-32s.
+              phaseTimer = setTimeout(runCycle, 18000 + Math.random() * 14000)
+            }, 900)
+          }, 2600)
+        }
+      }, 45)
+    }
+
+    phaseTimer = setTimeout(runCycle, 6000 + Math.random() * 6000)
+
+    return () => {
+      cancelled = true
+      clearInterval(typeTimer)
+      clearTimeout(phaseTimer)
+    }
+  }, [quotes])
+
+  if (phase === 'idle' || !text) return null
+
+  return (
+    <div className={`quote-whisper quote-whisper-${phase}`} aria-hidden="true">
+      {text}
+    </div>
+  )
+}
+
+// A loose, hand-drawn squiggle. Used as an underline / divider accent.
+function DoodleSquiggle({ className = '' }) {
+  return (
+    <svg
+      className={`doodle doodle-squiggle ${className}`}
+      viewBox="0 0 160 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M2 14C14 4 22 18 34 9C46 0 54 17 66 8C78 -1 86 16 98 7C110 -2 118 15 130 7C138 1 144 10 158 6"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+// A loose, hand-drawn smiley face.
+function DoodleSmiley({ className = '' }) {
+  return (
+    <svg
+      className={`doodle doodle-smiley ${className}`}
+      viewBox="0 0 40 40"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="20" cy="20" r="15" stroke="currentColor" strokeWidth="2.2" />
+      <circle cx="14.5" cy="17" r="1.6" fill="currentColor" />
+      <circle cx="25.5" cy="17" r="1.6" fill="currentColor" />
+      <path
+        d="M12.5 24C15 28.5 25 28.5 27.5 24"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+// Fades a section up into place the first time it scrolls into view.
+// IntersectionObserver-based (never a scroll listener) per the site's
+// motion guidelines.
+function Reveal({ children, className = '', as: Tag = 'div', ...rest }) {
+  const ref = useRef(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setVisible(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisible(true)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.15 }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <Tag ref={ref} className={`reveal ${visible ? 'is-visible' : ''} ${className}`} {...rest}>
+      {children}
+    </Tag>
+  )
+}
+
 // Shows the real logo if it loads; falls back to the bracket code if the
 // image hasn't been uploaded to /public/logos/ yet.
 function LinkIcon({ src, code }) {
@@ -439,7 +606,32 @@ function Overlay({ type, onClose, commentsState }) {
 
 export default function App() {
   const [activePanel, setActivePanel] = useState(null)
+  const [show3D, setShow3D] = useState(true)
   const commentsState = useComments()
+  const interactiveRef = useRef(null)
+
+  // Mobile fix: background effects like the 3D companion or the dot grid
+  // can attach their own touch listeners to the window to support drag
+  // gestures, and those can swallow a tap before the browser gets around to
+  // opening the keyboard for a real input. Stopping propagation right where
+  // the touch actually lands on an interactive element (inputs, buttons,
+  // links) keeps it from ever reaching those global listeners, without
+  // touching how the effects themselves work.
+  useEffect(() => {
+    const node = interactiveRef.current
+    if (!node) return
+    function stopIfInteractive(e) {
+      if (e.target.closest('input, textarea, button, a, select, label')) {
+        e.stopPropagation()
+      }
+    }
+    node.addEventListener('touchstart', stopIfInteractive, { capture: true, passive: true })
+    node.addEventListener('pointerdown', stopIfInteractive, { capture: true })
+    return () => {
+      node.removeEventListener('touchstart', stopIfInteractive, { capture: true })
+      node.removeEventListener('pointerdown', stopIfInteractive, { capture: true })
+    }
+  }, [])
 
   return (
     <div className="page">
@@ -447,7 +639,8 @@ export default function App() {
 
       <DotGrid />
       <CustomCursor />
-      <AnimalCompanion />
+      {show3D && <AnimalCompanion />}
+      <QuoteWhisper quotes={QUOTES} />
 
       <span className="corner corner-tl">+</span>
       <span className="corner corner-tr">+</span>
@@ -455,30 +648,36 @@ export default function App() {
       <span className="corner corner-br">+</span>
 
       <ViewCounter />
+      <FxToggle enabled={show3D} onToggle={() => setShow3D((v) => !v)} />
 
-      <main className="content">
+      <main className="content" ref={interactiveRef}>
         <header className="eyebrow-row">
           <span className="eyebrow">{PROFILE.schools}</span>
         </header>
 
-        <section className="hero">
+        <Reveal as="section" className="hero">
           <h1 className="headline">
             <span className="headline-lead">Welcome, I'm</span>
             <span className="headline-name">{PROFILE.name}.</span>
+            <DoodleSquiggle className="headline-squiggle" />
           </h1>
           <p className="bio">{PROFILE.bio}</p>
-        </section>
+        </Reveal>
 
-        <section className="stats" aria-label="Stats">
+        <Reveal as="section" className="stats" aria-label="Stats">
           {PROFILE.stats.map((s) => (
             <div className="stat" key={s.label}>
               <span className="stat-value">{s.value}</span>
               <span className="stat-label">{s.label}</span>
             </div>
           ))}
-        </section>
+        </Reveal>
 
-        <section className="links" aria-label="Social links">
+        <Reveal as="section" className="links" aria-label="Social links">
+          <p className="links-intro">
+            Follow me. <span className="links-intro-soft">or not</span>
+            <DoodleSmiley className="links-intro-smiley" />
+          </p>
           {PROFILE.links.map((l) => (
             <a
               key={l.code}
@@ -492,18 +691,23 @@ export default function App() {
               <span className="link-arrow">↗</span>
             </a>
           ))}
-        </section>
+        </Reveal>
 
-        <CommentsSection state={commentsState} onViewAll={() => setActivePanel('comments')} />
+        <Reveal as="div">
+          <CommentsSection state={commentsState} onViewAll={() => setActivePanel('comments')} />
+        </Reveal>
 
-        <section className="cta-row" aria-label="More">
-          <button className="cta-button" onClick={() => setActivePanel('races')}>
-            5Ks Around Me
-          </button>
-          <button className="cta-button" onClick={() => setActivePanel('projects')}>
-            Projects
-          </button>
-        </section>
+        <Reveal as="div">
+          <DoodleSquiggle className="cta-squiggle" />
+          <section className="cta-row" aria-label="More">
+            <button className="cta-button" onClick={() => setActivePanel('races')}>
+              5Ks Around Me
+            </button>
+            <button className="cta-button" onClick={() => setActivePanel('projects')}>
+              Projects
+            </button>
+          </section>
+        </Reveal>
 
         <SiteFooter />
       </main>
