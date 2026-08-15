@@ -60,7 +60,7 @@ const PROJECTS = [
 
 // Point this at your deployed Cloudflare Worker (see cloudflare-worker/README.md).
 // Leave blank to hide the view counter.
-const VIEW_COUNTER_URL = ''
+const VIEW_COUNTER_URL = 'https://sawyer-view-counter.sawyerbobk563.workers.dev/view'
 // ---------------------------------------------------------------------------
 
 function DotGrid() {
