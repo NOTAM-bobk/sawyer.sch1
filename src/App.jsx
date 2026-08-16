@@ -212,7 +212,17 @@ function DotGrid() {
       }
     }
     function handleResize() {
-      buildGrid()
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(buildGrid, 120)
+    }
+    let resizeTimer = null
+
+    function handleVisibility() {
+      if (document.hidden) {
+        cancelAnimationFrame(raf)
+      } else {
+        raf = requestAnimationFrame(step)
+      }
     }
 
     buildGrid()
@@ -221,16 +231,19 @@ function DotGrid() {
     window.addEventListener('touchstart', handleTouchStart, { passive: true })
     window.addEventListener('mouseleave', handleLeave)
     window.addEventListener('click', handleClick)
-    window.addEventListener('resize', handleResize)
+    window.addEventListener('resize', handleResize, { passive: true })
+    document.addEventListener('visibilitychange', handleVisibility)
 
     return () => {
       cancelAnimationFrame(raf)
+      clearTimeout(resizeTimer)
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('mouseleave', handleLeave)
       window.removeEventListener('click', handleClick)
       window.removeEventListener('resize', handleResize)
+      document.removeEventListener('visibilitychange', handleVisibility)
     }
   }, [])
 
@@ -270,9 +283,18 @@ function CustomCursor() {
     }
     loop()
 
+    function handleVisibility() {
+      if (document.hidden) {
+        cancelAnimationFrame(raf)
+      } else {
+        raf = requestAnimationFrame(loop)
+      }
+    }
+
     window.addEventListener('mousemove', handleMove, { passive: true })
     window.addEventListener('mousedown', handleDown)
     window.addEventListener('mouseup', handleUp)
+    document.addEventListener('visibilitychange', handleVisibility)
     document.body.classList.add('cursor-none')
 
     return () => {
@@ -280,6 +302,7 @@ function CustomCursor() {
       window.removeEventListener('mousemove', handleMove)
       window.removeEventListener('mousedown', handleDown)
       window.removeEventListener('mouseup', handleUp)
+      document.removeEventListener('visibilitychange', handleVisibility)
       document.body.classList.remove('cursor-none')
     }
   }, [])
@@ -620,6 +643,17 @@ function JokeOfTheDay() {
         New joke
       </button>
     </div>
+  )
+}
+
+// A small polaroid-style photo box. Drop the named file in /public and
+// it shows up here; caption is optional.
+function PhotoSticker({ src, caption, className = '' }) {
+  return (
+    <figure className={`photo-sticker ${className}`}>
+      <img src={src} alt="" className="photo-sticker-img" />
+      {caption && <figcaption className="photo-sticker-caption">{caption}</figcaption>}
+    </figure>
   )
 }
 
@@ -964,6 +998,11 @@ export default function App() {
               <ScrollDoodleArrow className="hero-scroll-arrow" />
             </Reveal>
 
+            <Reveal as="div" className="photo-row">
+              <PhotoSticker src="/sawyerrace.png" caption="race day" className="rotate-left" />
+              <PhotoSticker src="/sawyerfriends.png" caption="off the clock" className="rotate-right" />
+            </Reveal>
+
             <Reveal as="section" className="stats" aria-label="Stats">
               {PROFILE.stats.map((s) => (
                 <div className="stat" key={s.label}>
@@ -1007,6 +1046,7 @@ export default function App() {
                   Projects
                 </button>
               </section>
+              <PhotoSticker src="/sawyercoding.png" caption="behind the code" className="rotate-left photo-sticker-solo" />
               <JokeOfTheDay />
             </Reveal>
 
