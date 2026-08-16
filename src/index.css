@@ -630,9 +630,9 @@ body.cursor-none * {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--ink-soft);
-  background: var(--bg);
-  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--accent);
+  border: 1px solid var(--accent-ink);
   border-radius: 999px;
   padding: 6px 12px;
   opacity: 0;
@@ -655,7 +655,7 @@ body.cursor-none * {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-ink);
 }
 
 @media (max-width: 640px) {
@@ -779,6 +779,27 @@ body.cursor-none * {
   cursor: default;
 }
 
+.resume-download {
+  width: fit-content;
+  margin: 4px auto 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--accent-ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 16px;
+  transition: border-color 0.15s ease;
+}
+
+.resume-download:hover {
+  border-color: var(--accent-ink);
+}
+
 /* -------------------------------------------------------------------- */
 /* Full-screen overlay (races / projects)                               */
 /* -------------------------------------------------------------------- */
@@ -844,31 +865,71 @@ body.cursor-none * {
   margin: 0 0 32px;
 }
 
-.race-grid {
+.challenge-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
-.race-card {
+.challenge-card {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.race-name {
+.challenge-card.is-completed {
+  border-color: var(--accent-ink);
+  background: rgba(227, 167, 47, 0.12);
+}
+
+.challenge-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.challenge-name {
   font-weight: 600;
   font-size: 16px;
   letter-spacing: -0.01em;
 }
 
-.race-date {
+.challenge-check {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.challenge-date {
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--accent-ink);
+}
+
+.challenge-strava {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--accent-ink);
+  width: fit-content;
+  transition: color 0.15s ease;
+}
+
+.challenge-strava:hover {
+  color: var(--ink);
 }
 
 .project-list {
@@ -924,7 +985,7 @@ body.cursor-none * {
 }
 
 @media (max-width: 640px) {
-  .race-grid {
+  .challenge-grid {
     grid-template-columns: 1fr;
   }
   .overlay-body {
@@ -1428,9 +1489,46 @@ body.cursor-none * {
   margin: 4px auto 20px;
 }
 
+.photo-sticker-sm {
+  width: 76px;
+  padding: 5px 5px 8px;
+}
+
+.comments-row {
+  position: relative;
+}
+
+.comments-photo {
+  position: absolute;
+  top: -6px;
+  right: 0;
+}
+
+.cta-button-wrap {
+  position: relative;
+}
+
+.cta-photo-badge {
+  position: absolute;
+  top: -16px;
+  right: -12px;
+  z-index: 2;
+}
+
 @media (max-width: 640px) {
   .photo-sticker {
     width: 128px;
+  }
+  .photo-sticker-sm {
+    width: 60px;
+  }
+  .comments-photo {
+    top: -4px;
+    right: -2px;
+  }
+  .cta-photo-badge {
+    top: -12px;
+    right: -8px;
   }
 }
 
