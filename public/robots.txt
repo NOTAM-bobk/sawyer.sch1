@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://sawyer-sch1.vercel.app/sitemap.xml
