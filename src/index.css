@@ -70,6 +70,7 @@ body.cursor-none * {
   pointer-events: none;
   z-index: 9999;
   will-change: transform;
+  contain: strict;
 }
 
 .cursor-dot {
@@ -146,6 +147,7 @@ body.cursor-none * {
   z-index: 0;
   pointer-events: none;
   opacity: 0;
+  contain: strict;
   animation: dot-grid-fade-in 1.6s ease both;
   animation-delay: 0.05s;
 }
@@ -629,11 +631,10 @@ body.cursor-none * {
   font-size: 11px;
   letter-spacing: 0.04em;
   color: var(--ink-soft);
-  background: rgba(var(--bg-rgb), 0.85);
+  background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 6px 12px;
-  backdrop-filter: blur(4px);
   opacity: 0;
   animation: view-counter-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: 0.5s;
@@ -1006,12 +1007,14 @@ body.cursor-none * {
 }
 
 .footer-link {
-  color: var(--ink-soft);
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 2px;
   transition: color 0.15s ease;
 }
 
 .footer-link:hover {
-  color: var(--accent-ink);
+  color: #1d4ed8;
 }
 
 .footer-link-sep {
@@ -1297,6 +1300,9 @@ body.cursor-none * {
   .fx-controls {
     bottom: 58px;
     right: 14px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
   }
 }
 
@@ -1369,6 +1375,63 @@ body.cursor-none * {
 .doodle {
   display: block;
   overflow: visible;
+}
+
+/* -------------------------------------------------------------------- */
+/* Photo stickers                                                       */
+/* -------------------------------------------------------------------- */
+
+.photo-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.photo-sticker {
+  margin: 0;
+  width: 148px;
+  background: var(--bg);
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  padding: 8px 8px 12px;
+  box-shadow: 3px 4px 0 var(--line);
+}
+
+.photo-sticker-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.photo-sticker-caption {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.photo-sticker.rotate-left {
+  transform: rotate(-4deg);
+}
+
+.photo-sticker.rotate-right {
+  transform: rotate(3deg);
+}
+
+.photo-sticker-solo {
+  margin: 4px auto 20px;
+}
+
+@media (max-width: 640px) {
+  .photo-sticker {
+    width: 128px;
+  }
 }
 
 .headline-squiggle {
