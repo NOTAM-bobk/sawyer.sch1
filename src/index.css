@@ -266,6 +266,28 @@ body.cursor-none * {
   color: var(--ink-soft);
   letter-spacing: -0.01em;
   margin-bottom: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headline-photo-box {
+  width: 0.95em;
+  height: 0.95em;
+  flex-shrink: 0;
+  border: 1.5px solid var(--ink);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+  display: inline-flex;
+  transform: rotate(-3deg);
+}
+
+.headline-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* -------------------------------------------------------------------- */
@@ -401,6 +423,39 @@ body.cursor-none * {
   .headline-name {
     color: var(--ink);
     -webkit-text-stroke: 0;
+  }
+}
+
+.name-circle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 128%;
+  height: auto;
+  transform: translate(-50%, -50%);
+  color: var(--accent-ink);
+  pointer-events: none;
+}
+
+.name-circle path {
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+  animation: name-circle-draw 1.3s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+.name-circle.is-gone {
+  animation: name-circle-fade 0.6s ease forwards;
+}
+
+@keyframes name-circle-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes name-circle-fade {
+  to {
+    opacity: 0;
   }
 }
 
@@ -653,6 +708,77 @@ body.cursor-none * {
 }
 
 /* -------------------------------------------------------------------- */
+/* Joke of the day                                                      */
+/* -------------------------------------------------------------------- */
+
+.joke-box {
+  background: var(--accent);
+  border-radius: 14px;
+  padding: 22px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--ink);
+  box-shadow: 0 3px 0 var(--accent-ink);
+}
+
+.joke-box-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+
+.joke-box-text {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: clamp(15px, 2vw, 17px);
+  line-height: 1.5;
+}
+
+.joke-box-loading {
+  opacity: 0.7;
+}
+
+.joke-box-punchline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(16px, 2.2vw, 19px);
+  letter-spacing: -0.01em;
+}
+
+.joke-box-button {
+  align-self: flex-start;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--bg);
+  background: var(--ink);
+  border: none;
+  border-radius: 999px;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.joke-box-button:hover {
+  opacity: 0.85;
+}
+
+.joke-box-button:active {
+  transform: scale(0.97);
+}
+
+.joke-box-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* -------------------------------------------------------------------- */
 /* Full-screen overlay (races / projects)                               */
 /* -------------------------------------------------------------------- */
 
@@ -856,6 +982,10 @@ body.cursor-none * {
 /* -------------------------------------------------------------------- */
 
 .site-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   text-align: center;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -863,6 +993,29 @@ body.cursor-none * {
   letter-spacing: 0.02em;
   padding-top: 24px;
   border-top: 1px solid var(--line);
+}
+
+.site-footer-text {
+  margin: 0;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-link {
+  color: var(--ink-soft);
+  transition: color 0.15s ease;
+}
+
+.footer-link:hover {
+  color: var(--accent-ink);
+}
+
+.footer-link-sep {
+  color: var(--ink-faint);
 }
 
 /* -------------------------------------------------------------------- */
@@ -1238,6 +1391,32 @@ body.cursor-none * {
   margin-left: auto;
   color: var(--accent-ink);
   flex-shrink: 0;
+}
+
+.hero-scroll-arrow {
+  width: 26px;
+  height: 42px;
+  margin-top: 6px;
+  color: var(--ink-faint);
+  animation: scroll-arrow-bob 1.8s ease-in-out infinite;
+}
+
+@keyframes scroll-arrow-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-arrow {
+    animation: none;
+  }
 }
 
 /* -------------------------------------------------------------------- */
