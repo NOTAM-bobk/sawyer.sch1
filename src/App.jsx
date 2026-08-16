@@ -400,6 +400,9 @@ function SoundToggle() {
         aria-checked={playing}
         aria-label="Toggle background music"
         onClick={toggle}
+        onPointerDown={(e) => e.stopPropagation()}
+        onTouchStart={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <span className="sound-toggle-label">SOUND</span>
         <span className="sound-toggle-track">
@@ -507,6 +510,116 @@ function DoodleSmiley({ className = '' }) {
         strokeLinecap="round"
       />
     </svg>
+  )
+}
+
+// A loose, hand-drawn circle that "draws itself" around the name once the
+// skeleton loader finishes, then fades away a couple seconds later.
+// Purely decorative, aria-hidden.
+function NameCircleDoodle({ trigger }) {
+  const [phase, setPhase] = useState('idle') // idle | drawing | gone
+
+  useEffect(() => {
+    if (!trigger) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    setPhase('drawing')
+    const t = setTimeout(() => setPhase('gone'), 3200)
+    return () => clearTimeout(t)
+  }, [trigger])
+
+  if (phase === 'idle') return null
+
+  return (
+    <svg
+      className={`doodle name-circle ${phase === 'gone' ? 'is-gone' : ''}`}
+      viewBox="0 0 340 160"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M30 90C22 48 70 18 150 14C230 10 308 34 316 78C324 124 268 148 172 150C78 152 20 132 30 90Z"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+// A couple of loose, hand-drawn curved arrows nudging the visitor to
+// keep scrolling.
+function ScrollDoodleArrow({ className = '' }) {
+  return (
+    <svg
+      className={`doodle scroll-arrow ${className}`}
+      viewBox="0 0 60 96"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M30 4C21 22 41 34 28 50"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M14 40C19 46 24 50 28 54C33 49 38 45 44 41"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14 62C19 68 24 72 28 76C33 71 38 67 44 63"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+// Solid little card that pulls a random joke from the official-joke-api
+// and lets the visitor fetch another one on demand.
+function JokeOfTheDay() {
+  const [joke, setJoke] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  function fetchJoke() {
+    setLoading(true)
+    setError(false)
+    fetch('https://official-joke-api.appspot.com/random_joke')
+      .then((res) => res.json())
+      .then((data) => setJoke(data))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchJoke()
+  }, [])
+
+  return (
+    <div className="joke-box">
+      <span className="joke-box-label">Joke of the day</span>
+
+      {loading && <p className="joke-box-text joke-box-loading">Loading a joke…</p>}
+      {!loading && error && (
+        <p className="joke-box-text">Couldn't load a joke — try again.</p>
+      )}
+      {!loading && !error && joke && (
+        <>
+          <p className="joke-box-text">{joke.setup}</p>
+          <p className="joke-box-punchline">{joke.punchline}</p>
+        </>
+      )}
+
+      <button type="button" className="joke-box-button" onClick={fetchJoke} disabled={loading}>
+        New joke
+      </button>
+    </div>
   )
 }
 
@@ -644,7 +757,18 @@ function PageSkeleton({ leaving }) {
 function SiteFooter() {
   return (
     <footer className="site-footer">
-      Built and designed by Sawyer. By viewing this page you agree to the terms and service.
+      <p className="site-footer-text">
+        Built and designed by Sawyer. By viewing this page you agree to the terms and service.
+      </p>
+      <nav className="footer-links" aria-label="Quick links">
+        <a className="footer-link" href="#" target="_blank" rel="noreferrer">
+          Terms and Conditions
+        </a>
+        <span className="footer-link-sep" aria-hidden="true">·</span>
+        <a className="footer-link" href="#" target="_blank" rel="noreferrer">
+          Source Code
+        </a>
+      </nav>
     </footer>
   )
 }
@@ -810,8 +934,6 @@ export default function App() {
 
           <span className="corner corner-tl">+</span>
           <span className="corner corner-tr">+</span>
-          <span className="corner corner-bl">+</span>
-          <span className="corner corner-br">+</span>
 
           <ViewCounter />
           <div className="fx-controls">
@@ -826,11 +948,20 @@ export default function App() {
 
             <Reveal as="section" className="hero">
               <h1 className="headline">
-                <span className="headline-lead">Welcome, I'm</span>
-                <span className="headline-name">{PROFILE.name}.</span>
+                <span className="headline-lead">
+                  Welcome, I'm
+                  <span className="headline-photo-box">
+                    <img src="/boxsawyer.png" alt="" className="headline-photo" />
+                  </span>
+                </span>
+                <span className="headline-name">
+                  {PROFILE.name}.
+                  <NameCircleDoodle trigger={fontsReady} />
+                </span>
                 <DoodleSquiggle className="headline-squiggle" />
               </h1>
               <p className="bio">{PROFILE.bio}</p>
+              <ScrollDoodleArrow className="hero-scroll-arrow" />
             </Reveal>
 
             <Reveal as="section" className="stats" aria-label="Stats">
@@ -870,12 +1001,13 @@ export default function App() {
               <DoodleSquiggle className="cta-squiggle" />
               <section className="cta-row" aria-label="More">
                 <button className="cta-button" onClick={() => setActivePanel('races')}>
-                  5Ks Around Me
+                  Challenges
                 </button>
                 <button className="cta-button" onClick={() => setActivePanel('projects')}>
                   Projects
                 </button>
               </section>
+              <JokeOfTheDay />
             </Reveal>
 
             <SiteFooter />
