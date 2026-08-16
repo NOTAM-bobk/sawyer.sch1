@@ -9,9 +9,9 @@ const PROFILE = {
   name: 'Sawyer',
   schools: 'Yinghua Academy > Minnetonka High School',
   bio:
-    "I write code on weekdays and chase personal records on weekends. " +
-    "Currently building things for the web, training for the next race, " +
-    "and losing more Brawl Stars matches than I'd like to admit.",
+    "I think i am suposted to write something here... " +
+    "idk what, so i am going to leave , " +
+    "just scrool down.",
   stats: [
     { value: '1:58', label: '800M' },
     { value: '4:28', label: '1609M' },
@@ -23,10 +23,10 @@ const PROFILE = {
   // code shows instead so nothing breaks.
   links: [
     { code: 'IG', label: 'Instagram', href: 'https://instagram.com/yourusername', icon: '/logos/instagram.jpeg' },
-    { code: 'ST', label: 'Strava', href: 'https://strava.com/athletes/yourid', icon: '/logos/strava.jpeg' },
+    { code: 'ST', label: 'Strava', href: 'https://www.strava.com/athletes/935277048', icon: '/logos/strava.jpeg' },
     { code: 'BS', label: 'Brawl Stars', href: 'https://brawlify.com/stats/profile/yourtag', icon: '/logos/brawl.jpeg' },
-    { code: 'AN', label: 'Athletic.net', href: 'https://www.athletic.net/athlete/yourid', icon: '/logos/athletic.jpeg' },
-    { code: 'GM', label: 'Gmail', href: 'mailto:you@gmail.com', icon: '/logos/gmail.jpeg' },
+    { code: 'AN', label: 'Athletic.net', href: 'https://www.athletic.net/athlete/29503644/cross-country/all', icon: '/logos/athletic.jpeg' },
+    { code: 'GM', label: 'Gmail', href: 'sawyer11456:you@gmail.com', icon: '/logos/gmail.jpeg' },
   ],
 }
 
@@ -42,19 +42,19 @@ const RACES = [
 
 const PROJECTS = [
   {
-    name: 'Race Pace Calculator',
-    description: 'A small tool that turns a goal finish time into mile and kilometer splits.',
-    github: 'https://github.com/yourusername/race-pace-calculator',
+    name: 'Nexflix Clone',
+    description: 'a working copy of nexflix, with live playback.',
+    github: 'https://deephouse.vercel.app',
   },
   {
-    name: 'Strava Heatmap',
-    description: 'Pulls route data from the Strava API and renders a heatmap of everywhere I have run.',
-    github: 'https://github.com/yourusername/strava-heatmap',
+    name: 'Nimbus - Weather',
+    description: 'A clean weather app',
+    github: 'https://nimbus.edgeone.app/',
   },
   {
-    name: 'Training Log API',
-    description: 'A lightweight backend for logging workouts, mileage, and splits over a season.',
-    github: 'https://github.com/yourusername/training-log-api',
+    name: 'Chat',
+    description: 'a chat app with ai',
+    github: 'https://chat11.edgeone.app',
   },
 ]
 
