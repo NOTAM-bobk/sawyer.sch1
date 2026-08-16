@@ -30,14 +30,17 @@ const PROFILE = {
   ],
 }
 
-// Dummy data — swap for your real races and projects.
-const RACES = [
-  { name: 'Turkey Trot 5K', date: 'Nov 27' },
-  { name: 'Frozen Foot 5K', date: 'Jan 10' },
-  { name: 'Get Lucky 5K', date: 'Mar 14' },
-  { name: 'Torchlight 5K', date: 'Jul 18' },
-  { name: 'Red White & Boom 5K', date: 'Jul 4' },
-  { name: 'Cross Country Classic 5K', date: 'Sep 5' },
+// Challenges — this is the part you'll edit most.
+// To add a new one, just copy a line and change the values:
+//   { name: 'Challenge name', date: 'Mar 14', completed: false, strava: '' }
+// - name: shows on the card
+// - date: optional — leave as '' to hide it
+// - completed: true moves it to the top with a checkmark
+// - strava: optional Strava activity link shown as "proof" once completed
+const CHALLENGES = [
+  { name: '101 Mile Bike', date: '', completed: false, strava: '' },
+  { name: '5K Around a Block', date: '', completed: false, strava: '' },
+  { name: '5K Around a Tree', date: '', completed: false, strava: '' },
 ]
 
 const PROJECTS = [
@@ -832,17 +835,36 @@ function Overlay({ type, onClose, commentsState }) {
       </div>
 
       <div className="overlay-body">
-        {type === 'races' && (
+        {type === 'challenges' && (
           <>
-            <h2 className="overlay-title">Upcoming 5Ks</h2>
-            <p className="overlay-sub">Placeholder races — swap RACES in App.jsx for the real schedule.</p>
-            <div className="race-grid">
-              {RACES.map((r) => (
-                <div className="race-card" key={r.name}>
-                  <span className="race-name">{r.name}</span>
-                  <span className="race-date">{r.date}</span>
-                </div>
-              ))}
+            <h2 className="overlay-title">Challenges</h2>
+            <p className="overlay-sub">
+              Placeholder challenges — swap CHALLENGES in App.jsx for the real list. Completed ones float to the top.
+            </p>
+            <div className="challenge-grid">
+              {[...CHALLENGES]
+                .sort((a, b) => Number(b.completed) - Number(a.completed))
+                .map((c) => (
+                  <div className={`challenge-card ${c.completed ? 'is-completed' : ''}`} key={c.name}>
+                    <div className="challenge-head">
+                      <span className="challenge-name">{c.name}</span>
+                      {c.completed && (
+                        <span className="challenge-check" aria-hidden="true">✓</span>
+                      )}
+                    </div>
+                    {c.date && <span className="challenge-date">{c.date}</span>}
+                    {c.completed && c.strava && (
+                      <a
+                        className="challenge-strava"
+                        href={c.strava}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Proof on Strava ↗
+                      </a>
+                    )}
+                  </div>
+                ))}
             </div>
           </>
         )}
@@ -998,11 +1020,6 @@ export default function App() {
               <ScrollDoodleArrow className="hero-scroll-arrow" />
             </Reveal>
 
-            <Reveal as="div" className="photo-row">
-              <PhotoSticker src="/sawyerrace.png" caption="race day" className="rotate-left" />
-              <PhotoSticker src="/sawyerfriends.png" caption="off the clock" className="rotate-right" />
-            </Reveal>
-
             <Reveal as="section" className="stats" aria-label="Stats">
               {PROFILE.stats.map((s) => (
                 <div className="stat" key={s.label}>
@@ -1010,6 +1027,10 @@ export default function App() {
                   <span className="stat-label">{s.label}</span>
                 </div>
               ))}
+            </Reveal>
+
+            <Reveal as="div" className="photo-row">
+              <PhotoSticker src="/sawyerstats.png" className="photo-sticker-sm rotate-left" />
             </Reveal>
 
             <Reveal as="section" className="links" aria-label="Social links">
@@ -1032,22 +1053,31 @@ export default function App() {
               ))}
             </Reveal>
 
-            <Reveal as="div">
+            <Reveal as="div" className="comments-row">
               <CommentsSection state={commentsState} onViewAll={() => setActivePanel('comments')} />
+              {/* Sits near the "Say hi" heading inside CommentsSection.jsx.
+                  If that heading text is different, move .comments-photo's
+                  CSS anchor to match. */}
+              <PhotoSticker src="/sawyerhi.png" className="photo-sticker-sm rotate-right comments-photo" />
             </Reveal>
 
             <Reveal as="div">
               <DoodleSquiggle className="cta-squiggle" />
               <section className="cta-row" aria-label="More">
-                <button className="cta-button" onClick={() => setActivePanel('races')}>
+                <button className="cta-button" onClick={() => setActivePanel('challenges')}>
                   Challenges
                 </button>
-                <button className="cta-button" onClick={() => setActivePanel('projects')}>
-                  Projects
-                </button>
+                <div className="cta-button-wrap">
+                  <button className="cta-button" onClick={() => setActivePanel('projects')}>
+                    Projects
+                  </button>
+                  <PhotoSticker src="/sawyerprojects.png" className="photo-sticker-sm rotate-right cta-photo-badge" />
+                </div>
               </section>
-              <PhotoSticker src="/sawyercoding.png" caption="behind the code" className="rotate-left photo-sticker-solo" />
               <JokeOfTheDay />
+              <a href="/resume.pdf" download className="resume-download">
+                Download Résumé
+              </a>
             </Reveal>
 
             <SiteFooter />
