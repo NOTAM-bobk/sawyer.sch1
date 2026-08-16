@@ -88,7 +88,7 @@ function DotGrid() {
 
     const pointer = { x: -9999, y: -9999, active: false }
 
-    const SPACING = window.innerWidth < 640 ? 30 : 38
+    const SPACING = window.innerWidth < 640 ? 22 : 29
     const RADIUS = window.innerWidth < 640 ? 90 : 150
     const MAX_PUSH = 16
 
@@ -312,6 +312,104 @@ function FxToggle({ enabled, onToggle }) {
   )
 }
 
+// Small pill switch, fixed next to the 3D toggle, that plays/pauses a
+// looping background track. Expects the file at /public/song.mp3 — the
+// <audio> element just points at "/song.mp3", so drop the file in the
+// project's public/ folder and it's picked up automatically.
+//
+// Browsers block audio.play() until a real user gesture happens, so this
+// also listens for the page's first click/tap/keypress (anywhere, not
+// just the button) and starts the track then, easing the volume in
+// rather than snapping to full volume. If that first attempt is blocked
+// for some reason, it just waits for the next interaction and tries again.
+function SoundToggle() {
+  const audioRef = useRef(null)
+  const [playing, setPlaying] = useState(false)
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    let started = false
+    let fadeTimer = null
+
+    function fadeIn() {
+      audio.volume = 0
+      let v = 0
+      fadeTimer = setInterval(() => {
+        v += 0.08
+        if (v >= 1) {
+          audio.volume = 1
+          clearInterval(fadeTimer)
+        } else {
+          audio.volume = v
+        }
+      }, 60)
+    }
+
+    function tryAutoStart() {
+      if (started) return
+      started = true
+      audio
+        .play()
+        .then(() => {
+          fadeIn()
+          setPlaying(true)
+          removeListeners()
+        })
+        .catch(() => {
+          // Blocked — allow the next interaction to try again.
+          started = false
+        })
+    }
+
+    function removeListeners() {
+      window.removeEventListener('pointerdown', tryAutoStart)
+      window.removeEventListener('keydown', tryAutoStart)
+      window.removeEventListener('touchstart', tryAutoStart)
+    }
+
+    window.addEventListener('pointerdown', tryAutoStart)
+    window.addEventListener('keydown', tryAutoStart)
+    window.addEventListener('touchstart', tryAutoStart, { passive: true })
+
+    return () => {
+      clearInterval(fadeTimer)
+      removeListeners()
+    }
+  }, [])
+
+  function toggle() {
+    const audio = audioRef.current
+    if (!audio) return
+    if (playing) {
+      audio.pause()
+      setPlaying(false)
+    } else {
+      audio.volume = 1
+      audio.play().then(() => setPlaying(true)).catch(() => {})
+    }
+  }
+
+  return (
+    <>
+      <audio ref={audioRef} src="/song.mp3" loop preload="auto" />
+      <button
+        type="button"
+        className="sound-toggle"
+        role="switch"
+        aria-checked={playing}
+        aria-label="Toggle background music"
+        onClick={toggle}
+      >
+        <span className="sound-toggle-label">SOUND</span>
+        <span className="sound-toggle-track">
+          <span className="sound-toggle-thumb" />
+        </span>
+      </button>
+    </>
+  )
+}
+
 // Ambient background text: every so often it types out a short line, holds
 // it for a beat, then fades away. Sits behind the content and never
 // captures clicks.
@@ -515,6 +613,34 @@ function StickyClock() {
   )
 }
 
+// Shown until the custom typefaces (Archivo, Archivo Black, JetBrains
+// Mono) finish loading, so visitors get a placeholder shape of the page
+// instead of a flash of fallback-font text that then jumps around once
+// the real fonts swap in. Fades out once fonts are ready, revealing the
+// real content already mid-entrance-animation underneath.
+function PageSkeleton({ leaving }) {
+  return (
+    <div className={`page-skeleton ${leaving ? 'is-leaving' : ''}`} aria-hidden="true">
+      <div className="page-skeleton-inner">
+        <div className="skeleton-pill skeleton-pulse" />
+        <div className="skeleton-line title skeleton-pulse" />
+        <div className="skeleton-line title skeleton-pulse" style={{ width: '55%' }} />
+        <div className="skeleton-line skeleton-pulse" />
+        <div className="skeleton-line short skeleton-pulse" />
+        <div className="skeleton-row">
+          <div className="skeleton-pulse" />
+          <div className="skeleton-pulse" />
+          <div className="skeleton-pulse" />
+          <div className="skeleton-pulse" />
+        </div>
+        <div className="skeleton-line skeleton-pulse" />
+        <div className="skeleton-line skeleton-pulse" />
+        <div className="skeleton-line short skeleton-pulse" />
+      </div>
+    </div>
+  )
+}
+
 function SiteFooter() {
   return (
     <footer className="site-footer">
@@ -607,8 +733,44 @@ function Overlay({ type, onClose, commentsState }) {
 export default function App() {
   const [activePanel, setActivePanel] = useState(null)
   const [show3D, setShow3D] = useState(true)
+  const [fontsReady, setFontsReady] = useState(false)
+  const [showSkeleton, setShowSkeleton] = useState(true)
   const commentsState = useComments()
   const interactiveRef = useRef(null)
+
+  // Wait for the custom webfonts before showing text content, so nothing
+  // renders in a fallback font and then jumps when Archivo/Archivo Black
+  // swap in. Falls back to a fixed timeout if the Font Loading API isn't
+  // available or just never resolves.
+  useEffect(() => {
+    let cancelled = false
+    const fallback = setTimeout(() => {
+      if (!cancelled) setFontsReady(true)
+    }, 1500)
+
+    if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        if (!cancelled) setFontsReady(true)
+      })
+    } else {
+      setFontsReady(true)
+    }
+
+    return () => {
+      cancelled = true
+      clearTimeout(fallback)
+    }
+  }, [])
+
+  // Keep the skeleton mounted a beat longer than fontsReady so its
+  // fade-out transition has time to play over the top of the real
+  // content, which is already mounted and animating in underneath it.
+  useEffect(() => {
+    if (!fontsReady) return
+    const t = setTimeout(() => setShowSkeleton(false), 420)
+    return () => clearTimeout(t)
+  }, [fontsReady])
+
 
   // Mobile fix: background effects like the 3D companion or the dot grid
   // can attach their own touch listeners to the window to support drag
@@ -635,84 +797,93 @@ export default function App() {
 
   return (
     <div className="page">
-      <StickyClock />
-
       <DotGrid />
       <CustomCursor />
       {show3D && <AnimalCompanion />}
-      <QuoteWhisper quotes={QUOTES} />
 
-      <span className="corner corner-tl">+</span>
-      <span className="corner corner-tr">+</span>
-      <span className="corner corner-bl">+</span>
-      <span className="corner corner-br">+</span>
+      {showSkeleton && <PageSkeleton leaving={fontsReady} />}
 
-      <ViewCounter />
-      <FxToggle enabled={show3D} onToggle={() => setShow3D((v) => !v)} />
+      {fontsReady && (
+        <>
+          <StickyClock />
+          <QuoteWhisper quotes={QUOTES} />
 
-      <main className="content" ref={interactiveRef}>
-        <header className="eyebrow-row">
-          <span className="eyebrow">{PROFILE.schools}</span>
-        </header>
+          <span className="corner corner-tl">+</span>
+          <span className="corner corner-tr">+</span>
+          <span className="corner corner-bl">+</span>
+          <span className="corner corner-br">+</span>
 
-        <Reveal as="section" className="hero">
-          <h1 className="headline">
-            <span className="headline-lead">Welcome, I'm</span>
-            <span className="headline-name">{PROFILE.name}.</span>
-            <DoodleSquiggle className="headline-squiggle" />
-          </h1>
-          <p className="bio">{PROFILE.bio}</p>
-        </Reveal>
+          <ViewCounter />
+          <div className="fx-controls">
+            <SoundToggle />
+            <FxToggle enabled={show3D} onToggle={() => setShow3D((v) => !v)} />
+          </div>
 
-        <Reveal as="section" className="stats" aria-label="Stats">
-          {PROFILE.stats.map((s) => (
-            <div className="stat" key={s.label}>
-              <span className="stat-value">{s.value}</span>
-              <span className="stat-label">{s.label}</span>
-            </div>
-          ))}
-        </Reveal>
+          <main className="content" ref={interactiveRef}>
+            <header className="eyebrow-row">
+              <span className="eyebrow">{PROFILE.schools}</span>
+            </header>
 
-        <Reveal as="section" className="links" aria-label="Social links">
-          <p className="links-intro">
-            Follow me. <span className="links-intro-soft">or not</span>
-            <DoodleSmiley className="links-intro-smiley" />
-          </p>
-          {PROFILE.links.map((l) => (
-            <a
-              key={l.code}
-              className="link-row"
-              href={l.href}
-              target={l.href.startsWith('mailto:') ? undefined : '_blank'}
-              rel="noreferrer"
-            >
-              <LinkIcon src={l.icon} code={l.code} />
-              <span className="link-label">{l.label}</span>
-              <span className="link-arrow">↗</span>
-            </a>
-          ))}
-        </Reveal>
+            <Reveal as="section" className="hero">
+              <h1 className="headline">
+                <span className="headline-lead">Welcome, I'm</span>
+                <span className="headline-name">{PROFILE.name}.</span>
+                <DoodleSquiggle className="headline-squiggle" />
+              </h1>
+              <p className="bio">{PROFILE.bio}</p>
+            </Reveal>
 
-        <Reveal as="div">
-          <CommentsSection state={commentsState} onViewAll={() => setActivePanel('comments')} />
-        </Reveal>
+            <Reveal as="section" className="stats" aria-label="Stats">
+              {PROFILE.stats.map((s) => (
+                <div className="stat" key={s.label}>
+                  <span className="stat-value">{s.value}</span>
+                  <span className="stat-label">{s.label}</span>
+                </div>
+              ))}
+            </Reveal>
 
-        <Reveal as="div">
-          <DoodleSquiggle className="cta-squiggle" />
-          <section className="cta-row" aria-label="More">
-            <button className="cta-button" onClick={() => setActivePanel('races')}>
-              5Ks Around Me
-            </button>
-            <button className="cta-button" onClick={() => setActivePanel('projects')}>
-              Projects
-            </button>
-          </section>
-        </Reveal>
+            <Reveal as="section" className="links" aria-label="Social links">
+              <p className="links-intro">
+                Follow me. <span className="links-intro-soft">or not</span>
+                <DoodleSmiley className="links-intro-smiley" />
+              </p>
+              {PROFILE.links.map((l) => (
+                <a
+                  key={l.code}
+                  className="link-row"
+                  href={l.href}
+                  target={l.href.startsWith('mailto:') ? undefined : '_blank'}
+                  rel="noreferrer"
+                >
+                  <LinkIcon src={l.icon} code={l.code} />
+                  <span className="link-label">{l.label}</span>
+                  <span className="link-arrow">↗</span>
+                </a>
+              ))}
+            </Reveal>
 
-        <SiteFooter />
-      </main>
+            <Reveal as="div">
+              <CommentsSection state={commentsState} onViewAll={() => setActivePanel('comments')} />
+            </Reveal>
 
-      <Overlay type={activePanel} onClose={() => setActivePanel(null)} commentsState={commentsState} />
+            <Reveal as="div">
+              <DoodleSquiggle className="cta-squiggle" />
+              <section className="cta-row" aria-label="More">
+                <button className="cta-button" onClick={() => setActivePanel('races')}>
+                  5Ks Around Me
+                </button>
+                <button className="cta-button" onClick={() => setActivePanel('projects')}>
+                  Projects
+                </button>
+              </section>
+            </Reveal>
+
+            <SiteFooter />
+          </main>
+
+          <Overlay type={activePanel} onClose={() => setActivePanel(null)} commentsState={commentsState} />
+        </>
+      )}
     </div>
   )
 }
