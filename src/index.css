@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+Spray+Paint&family=VT323&display=swap');
 
 :root {
   --bg: #f2e6c8;
@@ -17,6 +17,10 @@
      clock, view counter, and ambient quotes to read like an old
      terminal or LED/VFD readout. */
   --font-digital: 'VT323', var(--font-mono);
+  /* Novelty display faces — name headline and the two "Follow me" /
+     "Say hi" section headings. */
+  --font-spray: 'Rubik Spray Paint', var(--font-display);
+  --font-blackops: 'Black Ops One', var(--font-display);
 }
 
 * {
@@ -409,15 +413,27 @@ body.cursor-none * {
 }
 
 .headline-name {
-  font-family: var(--font-display);
-  font-size: clamp(64px, 15vw, 148px);
-  letter-spacing: -0.02em;
+  font-family: var(--font-spray);
+  font-size: clamp(52px, 16vw, 148px);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.05;
   color: transparent;
-  -webkit-text-stroke: 2px var(--ink);
-  text-stroke: 2px var(--ink);
+  -webkit-text-stroke: 1.6px var(--ink);
+  text-stroke: 1.6px var(--ink);
   position: relative;
+  padding: 0 0.05em;
   animation: name-fly-in 1.15s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: 0.1s;
+}
+
+@media (max-width: 640px) {
+  .headline-name {
+    font-size: clamp(46px, 17vw, 84px);
+    letter-spacing: 0.005em;
+    -webkit-text-stroke: 1.2px var(--ink);
+    text-stroke: 1.2px var(--ink);
+  }
 }
 
 @keyframes name-fly-in {
@@ -1249,12 +1265,22 @@ body.cursor-none * {
 
 .comments-heading {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(20px, 3vw, 26px);
-  letter-spacing: -0.01em;
+  font-family: var(--font-blackops);
+  font-weight: 400;
+  font-size: clamp(18px, 3vw, 26px);
+  letter-spacing: 0.02em;
+  line-height: 1.3;
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .comments-heading {
+    font-size: clamp(17px, 5.5vw, 22px);
+    letter-spacing: 0.01em;
+    gap: 6px;
+  }
 }
 
 .comments-heading-lottie {
@@ -1798,14 +1824,67 @@ body.cursor-none * {
 /* -------------------------------------------------------------------- */
 
 .links-intro {
-  margin: 0 0 6px;
+  margin: 0 0 14px;
   display: flex;
   align-items: baseline;
+  flex-wrap: wrap;
+  row-gap: 4px;
   gap: 8px;
-  font-family: var(--font-display);
-  font-size: clamp(18px, 2.6vw, 22px);
-  letter-spacing: -0.01em;
+  font-family: var(--font-blackops);
+  font-weight: 400;
+  font-size: clamp(17px, 2.6vw, 22px);
+  letter-spacing: 0.015em;
+  line-height: 1.4;
   color: var(--ink);
+}
+
+@media (max-width: 640px) {
+  .links-intro {
+    margin: 0 0 18px;
+    gap: 7px;
+    font-size: clamp(16px, 5vw, 19px);
+    letter-spacing: 0.01em;
+  }
+}
+
+/* Wraps just the "Follow me." words so the hand-drawn underline can be
+   positioned relative to them, independent of the icon and "or not"
+   sitting alongside. */
+.links-intro-text {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 6px;
+}
+
+/* Hand-drawn underline squiggle that "draws itself" under "Follow me."
+   the first time it scrolls into view while scrolling DOWN — it stays
+   hidden if the section is reached by scrolling back up. Uses the
+   pathLength=1 trick so the dash math is just 0/1, no measuring. */
+.underline-doodle {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  width: calc(100% + 4px);
+  height: 10px;
+  color: var(--accent-ink);
+  pointer-events: none;
+}
+
+.underline-doodle path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.underline-doodle.is-active path {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .underline-doodle path {
+    transition: none;
+  }
 }
 
 /* Sized to match .headline-photo-box at the top of the page, so the
