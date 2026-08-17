@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 :root {
   --bg: #f2e6c8;
   --bg-rgb: 242, 230, 200;
@@ -11,6 +13,10 @@
   --font-display: 'Archivo Black', 'Archivo', system-ui, sans-serif;
   --font-sans: 'Archivo', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  /* Blocky, low-res "digital display" look — used sparingly for the
+     clock, view counter, and ambient quotes to read like an old
+     terminal or LED/VFD readout. */
+  --font-digital: 'VT323', var(--font-mono);
 }
 
 * {
@@ -747,14 +753,14 @@ body.cursor-none * {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
+  font-family: var(--font-digital);
+  font-size: 16px;
+  letter-spacing: 0.06em;
   color: var(--ink);
   background: var(--accent);
   border: 1px solid var(--accent-ink);
   border-radius: 999px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   opacity: 0;
   animation: view-counter-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: 0.5s;
@@ -781,7 +787,8 @@ body.cursor-none * {
 @media (max-width: 640px) {
   .view-counter {
     bottom: 14px;
-    font-size: 10px;
+    font-size: 15px;
+    padding: 6px 12px;
   }
 }
 
@@ -1159,14 +1166,18 @@ body.cursor-none * {
 }
 
 .sticky-clock-time {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--ink);
+  font-family: var(--font-digital);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--accent-ink);
+  text-shadow: 0 0 6px rgba(227, 167, 47, 0.55);
 }
 
 .sticky-clock-date {
-  font-size: 11px;
+  font-family: var(--font-digital);
+  font-size: 15px;
+  letter-spacing: 0.04em;
   color: var(--ink-faint);
 }
 
@@ -1175,10 +1186,10 @@ body.cursor-none * {
     padding: 8px 12px;
   }
   .sticky-clock-time {
-    font-size: 12px;
+    font-size: 18px;
   }
   .sticky-clock-date {
-    font-size: 10px;
+    font-size: 13px;
   }
 }
 
@@ -1247,9 +1258,12 @@ body.cursor-none * {
 }
 
 .comments-heading-lottie {
-  width: 34px;
-  height: 34px;
+  width: 46px;
+  height: 46px;
   display: inline-block;
+  border: none;
+  background: transparent;
+  pointer-events: none;
 }
 
 .comment-form,
@@ -1546,9 +1560,10 @@ body.cursor-none * {
   bottom: 60px;
   z-index: 1;
   max-width: 260px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.5;
+  font-family: var(--font-digital);
+  font-size: 17px;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
   color: var(--ink);
   pointer-events: none;
   user-select: none;
@@ -1577,11 +1592,11 @@ body.cursor-none * {
 .quote-whisper-holding::after {
   content: '';
   display: inline-block;
-  width: 1px;
-  height: 10px;
+  width: 2px;
+  height: 14px;
   margin-left: 2px;
   background: var(--ink);
-  vertical-align: -1px;
+  vertical-align: -2px;
   animation: quote-blink 1s steps(1) infinite;
 }
 
@@ -1596,7 +1611,7 @@ body.cursor-none * {
     left: 18px;
     bottom: 54px;
     max-width: 190px;
-    font-size: 11px;
+    font-size: 15px;
     padding: 8px 12px;
   }
 }
@@ -1831,9 +1846,9 @@ body.cursor-none * {
 
 .reveal {
   opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(18px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .reveal.is-visible {
