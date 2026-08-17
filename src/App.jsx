@@ -96,6 +96,11 @@ function DotGrid() {
     let dpr = Math.min(window.devicePixelRatio || 1, 2)
 
     const pointer = { x: -9999, y: -9999, active: false }
+    // Slow parallax: the grid drifts a little as the page scrolls, at a
+    // fraction of the real scroll speed, so it reads as sitting further
+    // back than the content scrolling over it.
+    const PARALLAX_FACTOR = 0.06
+    let scrollY = window.scrollY || 0
 
     const SPACING = window.innerWidth < 640 ? 22 : 29
     const RADIUS = window.innerWidth < 640 ? 90 : 150
@@ -172,7 +177,8 @@ function DotGrid() {
         d.heat += (heatTarget - d.heat) * 0.12
 
         const x = d.ox + d.dx
-        const y = d.oy + d.dy
+        const parallaxOffset = (scrollY * PARALLAX_FACTOR) % SPACING
+        const y = d.oy + d.dy - parallaxOffset
         const size = 1.3 + d.heat * 1.6
 
         const inkR = 23, inkG = 20, inkB = 15
@@ -226,6 +232,10 @@ function DotGrid() {
     }
     let resizeTimer = null
 
+    function handleScroll() {
+      scrollY = window.scrollY || 0
+    }
+
     function handleVisibility() {
       if (document.hidden) {
         cancelAnimationFrame(raf)
@@ -241,6 +251,7 @@ function DotGrid() {
     window.addEventListener('mouseleave', handleLeave)
     window.addEventListener('click', handleClick)
     window.addEventListener('resize', handleResize, { passive: true })
+    window.addEventListener('scroll', handleScroll, { passive: true })
     document.addEventListener('visibilitychange', handleVisibility)
 
     return () => {
@@ -252,6 +263,7 @@ function DotGrid() {
       window.removeEventListener('mouseleave', handleLeave)
       window.removeEventListener('click', handleClick)
       window.removeEventListener('resize', handleResize)
+      window.removeEventListener('scroll', handleScroll)
       document.removeEventListener('visibilitychange', handleVisibility)
     }
   }, [])
@@ -502,7 +514,7 @@ function LanguageIcon({ src, name, onSettle }) {
 // wide the screen is. It moves at a constant pixel-per-second pace (the
 // animation duration scales with the measured width instead of being a
 // fixed number of seconds) and it never pauses, even on hover.
-const CAROUSEL_SPEED_PX_PER_SEC = 40
+const CAROUSEL_SPEED_PX_PER_SEC = 26
 
 function LanguageCarousel({ languages }) {
   const containerRef = useRef(null)
