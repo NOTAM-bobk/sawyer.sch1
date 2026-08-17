@@ -221,7 +221,7 @@ body.cursor-none * {
   padding: 96px 24px 64px;
   display: flex;
   flex-direction: column;
-  gap: 56px;
+  gap: 76px;
   min-height: 100dvh;
 }
 
@@ -705,7 +705,7 @@ body.cursor-none * {
 @media (max-width: 640px) {
   .content {
     padding: 72px 18px 40px;
-    gap: 40px;
+    gap: 52px;
   }
   .link-row {
     padding: 14px 4px;
@@ -794,7 +794,7 @@ body.cursor-none * {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-top: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 36px;
 }
 
 .cta-button {
@@ -850,6 +850,7 @@ body.cursor-none * {
   gap: 10px;
   color: var(--ink);
   box-shadow: 0 3px 0 var(--accent-ink);
+  margin-bottom: 32px;
 }
 
 .joke-box-label {
@@ -1240,6 +1241,15 @@ body.cursor-none * {
   font-family: var(--font-display);
   font-size: clamp(20px, 3vw, 26px);
   letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comments-heading-lottie {
+  width: 34px;
+  height: 34px;
+  display: inline-block;
 }
 
 .comment-form,
@@ -1543,6 +1553,14 @@ body.cursor-none * {
   pointer-events: none;
   user-select: none;
   opacity: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  /* Frosted-glass panel — blurs the dot grid / whatever's directly
+     behind the text so it stays legible without needing a solid, more
+     visually heavy background. */
+  background: rgba(var(--bg-rgb), 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: opacity 0.9s ease;
 }
 
@@ -1579,6 +1597,7 @@ body.cursor-none * {
     bottom: 54px;
     max-width: 190px;
     font-size: 11px;
+    padding: 8px 12px;
   }
 }
 
