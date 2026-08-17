@@ -471,29 +471,90 @@ function GitHubStats() {
 
 // A single icon in the language strip. Quietly disappears if its image
 // hasn't been added to /public/languages/ yet, instead of showing a
-// broken-image icon.
-function LanguageIcon({ src, name }) {
+// broken-image icon. Reports back to the carousel whenever it disappears
+// so the strip can re-measure itself.
+function LanguageIcon({ src, name, onSettle }) {
   const [failed, setFailed] = useState(false)
   if (failed) return null
   return (
     <span className="language-pill" title={name}>
-      <img src={src} alt={name} className="language-pill-img" onError={() => setFailed(true)} />
+      <img
+        src={src}
+        alt={name}
+        className="language-pill-img"
+        onError={() => {
+          setFailed(true)
+          // Losing an icon changes the width of the set, so re-measure
+          // on the next tick once React has removed it from the layout.
+          requestAnimationFrame(() => onSettle?.())
+        }}
+      />
     </span>
   )
 }
 
 // Endless-scrolling strip of language/tool icons, sat right under the
-// GitHub stats. The list is duplicated once so the CSS animation can
-// loop seamlessly — add or remove entries in LANGUAGES above and this
-// just keeps working.
+// GitHub stats. Rather than assuming a fixed number of copies loops
+// seamlessly, this measures the real rendered width of one full set of
+// icons plus the visible track width, then renders exactly as many
+// copies as needed to always cover at least twice the viewport — so
+// there's never a gap, no matter how many icons are in the list or how
+// wide the screen is. It moves at a constant pixel-per-second pace (the
+// animation duration scales with the measured width instead of being a
+// fixed number of seconds) and it never pauses, even on hover.
+const CAROUSEL_SPEED_PX_PER_SEC = 40
+
 function LanguageCarousel({ languages }) {
+  const containerRef = useRef(null)
+  const setRef = useRef(null)
+  const [repeat, setRepeat] = useState(2)
+  const [setWidth, setSetWidth] = useState(0)
+
+  function measure() {
+    const setEl = setRef.current
+    const containerEl = containerRef.current
+    if (!setEl || !containerEl) return
+    const width = setEl.getBoundingClientRect().width
+    const containerWidth = containerEl.getBoundingClientRect().width
+    if (width <= 0) return
+    // Enough copies so the track always spans at least 2x the visible
+    // width — the strip can never run out of icons before the loop
+    // resets, so no blank space ever shows up mid-scroll.
+    const needed = Math.max(2, Math.ceil((containerWidth * 2) / width) + 1)
+    setSetWidth(width)
+    setRepeat(needed)
+  }
+
+  useEffect(() => {
+    measure()
+    window.addEventListener('resize', measure, { passive: true })
+    return () => window.removeEventListener('resize', measure)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [languages])
+
   if (!languages || languages.length === 0) return null
-  const track = [...languages, ...languages]
+
+  const duration = setWidth > 0 ? setWidth / CAROUSEL_SPEED_PX_PER_SEC : 24
+
   return (
-    <div className="language-carousel" aria-label="Languages I use">
-      <div className="language-carousel-track">
-        {track.map((l, i) => (
-          <LanguageIcon key={`${l.name}-${i}`} src={l.icon} name={l.name} />
+    <div className="language-carousel" ref={containerRef} aria-label="Languages I use">
+      <div
+        className="language-carousel-track"
+        style={{
+          animationDuration: `${duration}s`,
+          '--carousel-set-width': setWidth ? `${setWidth}px` : '50%',
+        }}
+      >
+        {Array.from({ length: repeat }).map((_, copyIndex) => (
+          <div
+            className="language-carousel-set"
+            key={copyIndex}
+            ref={copyIndex === 0 ? setRef : undefined}
+          >
+            {languages.map((l, i) => (
+              <LanguageIcon key={`${l.name}-${i}`} src={l.icon} name={l.name} onSettle={measure} />
+            ))}
+          </div>
         ))}
       </div>
     </div>
@@ -719,15 +780,15 @@ function QuoteWhisper({ quotes }) {
               if (cancelled) return
               setPhase('idle')
               setText('')
-              // Not that often — next line shows up in ~18-32s.
-              phaseTimer = setTimeout(runCycle, 18000 + Math.random() * 14000)
+              // Ambient, but a bit more frequent — next line shows up in ~11-20s.
+              phaseTimer = setTimeout(runCycle, 11000 + Math.random() * 9000)
             }, 900)
           }, 2600)
         }
       }, 45)
     }
 
-    phaseTimer = setTimeout(runCycle, 6000 + Math.random() * 6000)
+    phaseTimer = setTimeout(runCycle, 4000 + Math.random() * 4000)
 
     return () => {
       cancelled = true
