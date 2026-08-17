@@ -61,6 +61,8 @@ const QUOTES = [
   'better luck next time .. :(',
   'Nolan can read this',
   'why not,,.',
+  'D1 vibe coder',
+  'niko schultz fan',
   'do it scared',
   'progress over perfect',
 ]
