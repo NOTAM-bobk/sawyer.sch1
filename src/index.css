@@ -523,6 +523,106 @@ body.cursor-none * {
   }
 }
 
+/* -------------------------------------------------------------------- */
+/* Live GitHub stats — centered on every screen size, not gridded       */
+/* -------------------------------------------------------------------- */
+
+.stats.stats-github {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  border-top: 1px solid var(--line);
+  border-bottom: none;
+}
+
+.stats.stats-github .stat {
+  flex: 0 1 auto;
+  min-width: 130px;
+  border-left: 1px solid var(--line);
+}
+
+.stats.stats-github .stat:first-child {
+  border-left: none;
+}
+
+.github-block {
+  border-bottom: 1px solid var(--line);
+}
+
+/* -------------------------------------------------------------------- */
+/* Scrolling language/tool icon strip                                   */
+/* -------------------------------------------------------------------- */
+
+.language-carousel {
+  overflow: hidden;
+  padding: 16px 0;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.language-carousel-track {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  width: max-content;
+  animation: language-scroll 24s linear infinite;
+}
+
+.language-carousel:hover .language-carousel-track {
+  animation-play-state: paused;
+}
+
+.language-pill {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.language-pill:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.language-pill-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+@keyframes language-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* Track is the language list duplicated once, so -50% is exactly
+       one full loop and the animation restarts seamlessly. */
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .language-carousel-track {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .language-pill {
+    width: 32px;
+    height: 32px;
+  }
+  .language-carousel-track {
+    gap: 24px;
+  }
+}
+
 .links {
   display: flex;
   flex-direction: column;
@@ -688,6 +788,15 @@ body.cursor-none * {
   padding: 22px 18px;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  /* .cta-button is a plain <button>, which is inline-block by default.
+     The "Challenges" button sits directly in the cta-row grid, so it
+     naturally stretches to fill its column — but the "Projects" button
+     is nested inside .cta-button-wrap (for the photo badge) and would
+     otherwise only be as wide as its own text. Forcing width:100% here
+     keeps both buttons exactly the same length on every screen size. */
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
 }
 
 .cta-button:hover {
@@ -812,6 +921,19 @@ body.cursor-none * {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+}
+
+/* Faint diagonal ruled lines behind the challenges/projects overlays —
+   purely decorative texture, kept low-contrast so cards stay readable. */
+.overlay-lined {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--line) 0,
+    var(--line) 1px,
+    transparent 1px,
+    transparent 26px
+  );
+  background-color: var(--bg);
 }
 
 .overlay-bar {
