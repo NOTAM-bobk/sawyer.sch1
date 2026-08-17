@@ -63,6 +63,7 @@ const QUOTES = [
   'why not,,.',
   'D1 vibe coder',
   'niko schultz fan',
+  '2010s music is FIRE',
   'do it scared',
   'progress over perfect',
 ]
