@@ -837,28 +837,6 @@ function DoodleSquiggle({ className = '' }) {
   )
 }
 
-// A loose, hand-drawn scribble that runs almost the full width of the
-// content column. Used as a divider between the "Follow me" and "Say hi"
-// sections.
-function DoodleScribble({ className = '' }) {
-  return (
-    <svg
-      className={`doodle doodle-scribble ${className}`}
-      viewBox="0 0 400 28"
-      fill="none"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M2 16C18 4 30 26 46 13C62 0 76 25 92 12C108 -1 120 24 136 11C152 -2 166 23 182 10C198 -3 212 22 228 12C244 2 258 20 274 11C290 2 304 19 320 12C336 5 350 17 366 13C378 9 388 15 398 12"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
-}
-
 // A loose, hand-drawn smiley face.
 function DoodleSmiley({ className = '' }) {
   return (
@@ -1529,10 +1507,6 @@ export default function App() {
               ))}
             </Reveal>
 
-            <Reveal as="div" className="section-scribble-wrap">
-              <DoodleScribble className="section-scribble" />
-            </Reveal>
-
             <Reveal as="div" className="comments-row">
               <CommentsSection state={commentsState} onViewAll={() => setActivePanel('comments')} />
             </Reveal>
@@ -1541,11 +1515,13 @@ export default function App() {
               <DoodleSquiggle className="cta-squiggle" />
               <section className="cta-row" aria-label="More">
                 <button className="cta-button" onClick={() => setActivePanel('challenges')}>
-                  Challenges
+                  <span>Challenges</span>
+                  <span className="cta-button-arrow" aria-hidden="true">→</span>
                 </button>
                 <div className="cta-button-wrap">
                   <button className="cta-button" onClick={() => setActivePanel('projects')}>
-                    Projects
+                    <span>Projects</span>
+                    <span className="cta-button-arrow" aria-hidden="true">→</span>
                   </button>
                   <PhotoSticker src="/sawyerprojects.png" className="photo-sticker-sm rotate-right cta-photo-badge" />
                 </div>
