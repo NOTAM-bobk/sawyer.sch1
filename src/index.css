@@ -732,6 +732,9 @@ body.cursor-none * {
   .link-row {
     padding: 14px 4px;
   }
+  .comments-row {
+    margin-top: -38px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -829,16 +832,19 @@ body.cursor-none * {
   font-weight: 600;
   font-size: clamp(14.5px, 1.9vw, 16px);
   letter-spacing: -0.01em;
-  color: var(--ink);
-  background: rgba(var(--bg-rgb), 0.6);
-  border: 1px solid var(--line);
+  color: var(--bg);
+  background: var(--ink);
+  border: 1px solid var(--ink);
   border-radius: 10px;
   padding: 16px 18px;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(23, 20, 15, 0.05);
+  /* Chunky bottom-offset shadow reads as a physical, pressable button
+     rather than a flat swatch — it gets shorter on :active to sell the
+     press, and taller on :hover to sell the lift. */
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.55), 0 8px 18px rgba(23, 20, 15, 0.22);
   transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1),
     color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease,
-    box-shadow 0.2s ease, transform 0.15s ease;
+    box-shadow 0.15s ease, transform 0.15s ease;
   /* .cta-button is a plain <button>, which is inline-block by default.
      The "Challenges" button sits directly in the cta-row grid, so it
      naturally stretches to fill its column — but the "Projects" button
@@ -852,7 +858,7 @@ body.cursor-none * {
 .cta-button-arrow {
   font-family: var(--font-mono);
   font-size: 15px;
-  color: var(--ink-faint);
+  color: rgba(var(--bg-rgb), 0.65);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
 }
 
@@ -860,8 +866,8 @@ body.cursor-none * {
   background: var(--ink);
   color: var(--bg);
   border-color: var(--ink);
-  box-shadow: 0 6px 18px rgba(23, 20, 15, 0.14);
-  transform: translateY(-1px);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.55), 0 14px 26px rgba(23, 20, 15, 0.3);
+  transform: translateY(-2px);
 }
 
 .cta-button:hover .cta-button-arrow {
@@ -870,8 +876,8 @@ body.cursor-none * {
 }
 
 .cta-button:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 0 1px 2px rgba(23, 20, 15, 0.08);
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.55), 0 2px 6px rgba(23, 20, 15, 0.2);
 }
 
 @media (max-width: 560px) {
@@ -1289,10 +1295,10 @@ body.cursor-none * {
 /* Small squiggle directly above "Say hi" — mirrors .links-top-squiggle
    above "Follow me." so both section headings share the same rhythm. */
 .comments-heading-squiggle {
-  width: 110px;
-  height: 13px;
+  width: 170px;
+  height: 21px;
   margin-bottom: 8px;
-  color: var(--ink-faint);
+  color: var(--ink);
 }
 
 .comments-heading {
@@ -1802,6 +1808,10 @@ body.cursor-none * {
 
 .comments-row {
   position: relative;
+  /* .content puts a large 76px gap between every top-level section — pull
+     this one up so "Say hi" sits right under the social links instead of
+     leaving a big empty stretch. */
+  margin-top: -56px;
 }
 
 .cta-button-wrap {
@@ -1899,10 +1909,10 @@ body.cursor-none * {
 /* -------------------------------------------------------------------- */
 
 .links-top-squiggle {
-  width: 110px;
-  height: 13px;
+  width: 170px;
+  height: 21px;
   margin-bottom: 8px;
-  color: var(--ink-faint);
+  color: var(--ink);
 }
 
 .links-intro {
