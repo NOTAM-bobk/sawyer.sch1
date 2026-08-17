@@ -1,1 +1,1 @@
-{"$schema": "https://openapi.vercel.sh/vercel.json","cleanUrls": true,"headers": [{"source": "/(.*\.(jpg|jpeg|png|gif|webp|svg|ico))","headers": [{"key": "Cache-Control","value": "public, max-age=31536000, immutable"}]}]}
+{"cleanUrls": true,"headers": [{"source": "/sawyer.png","headers": [{"key": "Cache-Control","value": "public, max-age=31536000, immutable"}]},{"source": "/og-image.png","headers": [{"key": "Cache-Control","value": "public, max-age=31536000, immutable"}]}]}
