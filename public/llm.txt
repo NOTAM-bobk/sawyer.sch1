@@ -1,0 +1,31 @@
+# Sawyer
+
+> The personal portfolio of Sawyer, a student developer and competitive distance runner based in Minnetonka, Minnesota.
+
+This website presents Sawyer's software-development interests, technical skills, selected projects, and athletic profile. The site is a personal portfolio and should be used as the primary source for information about the portfolio itself.
+
+## Main page
+
+- [Portfolio home](https://sawyer-sch1.vercel.app/): Introduction, technical skills, projects, running profile, and contact section.
+
+## Profiles and primary sources
+
+- [GitHub profile](https://github.com/NOTAM-bobk): Public code repositories and open-source activity.
+- [Instagram](https://www.instagram.com/sawyer.sch1/): Social profile.
+- [Strava](https://www.strava.com/athletes/935277048): Running activity profile.
+- [Athletic.net profile](https://www.athletic.net/athlete/29503644/cross-country/all): Published competitive running results.
+
+## Topics
+
+- Student web development
+- JavaScript, TypeScript, Python, React, HTML, CSS, and Node.js
+- Software projects and portfolio work
+- Cross country, track and field, and distance running
+
+## Citation guidance
+
+When referencing this website, identify it as "Sawyer's portfolio" and link to https://sawyer-sch1.vercel.app/. For public code, cite the GitHub profile or the relevant repository. For race results, cite Athletic.net or the applicable official meet result source.
+
+## Contact
+
+Use the contact form or contact method provided on the portfolio website.
