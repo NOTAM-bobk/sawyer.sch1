@@ -7,7 +7,7 @@ import AnimalCompanion from './AnimalCompanion.jsx'
 // ---------------------------------------------------------------------------
 const PROFILE = {
   name: 'Sawyer',
-  schools: 'Yinghua Academy > Minnetonka High School',
+  schools: 'Yinghua Academy > Minnetonka High School 29'',
   bio:
     "I think i am suposted to write something here... " +
     "idk what, so i am going to leave , " +
@@ -22,9 +22,9 @@ const PROFILE = {
   // for the exact filenames expected. If a file is missing, the bracket
   // code shows instead so nothing breaks.
   links: [
-    { code: 'IG', label: 'Instagram', href: 'https://instagram.com/yourusername', icon: '/logos/instagram.jpeg' },
+    { code: 'IG', label: 'Instagram', href: 'https://www.instagram.com/sawyer.sch1/', icon: '/logos/instagram.jpeg' },
     { code: 'ST', label: 'Strava', href: 'https://www.strava.com/athletes/935277048', icon: '/logos/strava.jpeg' },
-    { code: 'BS', label: 'Brawl Stars', href: 'https://brawlify.com/stats/profile/yourtag', icon: '/logos/brawl.jpeg' },
+    { code: 'BS', label: 'Brawl Stars', href: 'https://brawlace.com/players/%232GG8JC002R', icon: '/logos/brawl.jpeg' },
     { code: 'AN', label: 'Athletic.net', href: 'https://www.athletic.net/athlete/29503644/cross-country/all', icon: '/logos/athletic.jpeg' },
     { code: 'GM', label: 'Gmail', href: 'sawyer11456:you@gmail.com', icon: '/logos/gmail.jpeg' },
   ],
@@ -39,6 +39,8 @@ const PROFILE = {
 // - strava: optional Strava activity link shown as "proof" once completed
 const CHALLENGES = [
   { name: '101 Mile Bike', date: '', completed: false, strava: '' },
+  { name: '12 mile walk', date: '', completed: true, strava: '' },
+  { name: 'triathon', date: '', completed: false, strava: '' },
   { name: '5K Around a Block', date: '', completed: false, strava: '' },
   { name: '5K Around a Tree', date: '', completed: false, strava: '' },
 ]
@@ -56,9 +58,9 @@ const VIEW_COUNTER_URL = 'https://sawyer-view-counter.sawyerbobk563.workers.dev/
 // background, then fade away. Purely decorative. Add as many as you want —
 // just drop another string in the array, nothing else to configure.
 const QUOTES = [
-  'small steps still count',
-  'chase splits, not perfection',
-  'code, run, repeat',
+  'better luck next time .. :(',
+  'Nolan can read this',
+  'why not,,.',
   'do it scared',
   'progress over perfect',
 ]
