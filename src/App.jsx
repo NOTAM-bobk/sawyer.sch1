@@ -43,23 +43,10 @@ const CHALLENGES = [
   { name: '5K Around a Tree', date: '', completed: false, strava: '' },
 ]
 
-const PROJECTS = [
-  {
-    name: 'Nexflix Clone',
-    description: 'a working copy of nexflix, with live playback.',
-    github: 'https://deephouse.vercel.app',
-  },
-  {
-    name: 'Nimbus - Weather',
-    description: 'A clean weather app',
-    github: 'https://nimbus.edgeone.app/',
-  },
-  {
-    name: 'Chat',
-    description: 'a chat app with ai',
-    github: 'https://chat11.edgeone.app',
-  },
-]
+// GitHub username the live stats + projects list are pulled from.
+// Change this one value and everything below (contribution count,
+// repo count, the auto-fetched projects list) updates with it.
+const GITHUB_USERNAME = 'NOTAM-bobk'
 
 // Point this at your deployed Cloudflare Worker (see cloudflare-worker/README.md).
 // Leave blank to hide the view counter.
@@ -251,6 +238,124 @@ function DotGrid() {
   }, [])
 
   return <canvas ref={canvasRef} className="dot-grid" aria-hidden="true" />
+}
+
+// Animates a number counting up from 0 to `target` once `start` flips true.
+// Eased so it starts fast and settles in, like an odometer. Respects
+// prefers-reduced-motion by jumping straight to the final value.
+function useCountUp(target, { duration = 1400, start = false } = {}) {
+  const [value, setValue] = useState(0)
+
+  useEffect(() => {
+    if (!start || target == null) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setValue(target)
+      return
+    }
+    let raf
+    const startTime = performance.now()
+    function tick(now) {
+      const progress = Math.min((now - startTime) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setValue(Math.round(target * eased))
+      if (progress < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [target, start, duration])
+
+  return value
+}
+
+// Live GitHub stats — lifetime contributions and public repo count for
+// GITHUB_USERNAME. Repo count comes straight from the GitHub REST API
+// (api.github.com/users/:user). Lifetime contributions aren't exposed by
+// that API (it's normally rendered server-side on github.com), so this
+// walks every year from the account's creation date to now and sums the
+// yearly totals from the public github-contributions-api mirror. The
+// numbers count up once this row scrolls into view.
+function GitHubStats() {
+  const [data, setData] = useState(null)
+  const [error, setError] = useState(false)
+  const [started, setStarted] = useState(false)
+  const rowRef = useRef(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      try {
+        const userRes = await fetch(`https://api.github.com/users/${GITHUB_USERNAME}`)
+        if (!userRes.ok) throw new Error('user fetch failed')
+        const user = await userRes.json()
+
+        const joinYear = new Date(user.created_at).getFullYear()
+        const currentYear = new Date().getFullYear()
+        const years = []
+        for (let y = joinYear; y <= currentYear; y++) years.push(y)
+
+        const yearly = await Promise.all(
+          years.map((y) =>
+            fetch(`https://github-contributions-api.jogruber.de/v4/${GITHUB_USERNAME}?y=${y}`)
+              .then((r) => (r.ok ? r.json() : null))
+              .catch(() => null)
+          )
+        )
+
+        const contributions = yearly.reduce((sum, yearData, i) => {
+          if (!yearData || !yearData.total) return sum
+          return sum + (yearData.total[years[i]] || 0)
+        }, 0)
+
+        if (!cancelled) {
+          setData({ contributions, repos: user.public_repos || 0 })
+        }
+      } catch {
+        if (!cancelled) setError(true)
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    const node = rowRef.current
+    if (!node) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setStarted(true)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.3 }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  const contributions = useCountUp(data?.contributions ?? 0, { start: started && !!data })
+  const repos = useCountUp(data?.repos ?? 0, { start: started && !!data })
+
+  if (error) return null
+
+  return (
+    <div className="stats stats-github" ref={rowRef} aria-label="GitHub stats">
+      <div className="stat">
+        <span className="stat-value">{data ? contributions.toLocaleString() : '—'}</span>
+        <span className="stat-label">LIFETIME CONTRIBUTIONS</span>
+      </div>
+      <div className="stat">
+        <span className="stat-value">{data ? repos.toLocaleString() : '—'}</span>
+        <span className="stat-label">REPOSITORIES</span>
+      </div>
+    </div>
+  )
 }
 
 function CustomCursor() {
@@ -517,6 +622,28 @@ function DoodleSquiggle({ className = '' }) {
   )
 }
 
+// A loose, hand-drawn scribble that runs almost the full width of the
+// content column. Used as a divider between the "Follow me" and "Say hi"
+// sections.
+function DoodleScribble({ className = '' }) {
+  return (
+    <svg
+      className={`doodle doodle-scribble ${className}`}
+      viewBox="0 0 400 28"
+      fill="none"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M2 16C18 4 30 26 46 13C62 0 76 25 92 12C108 -1 120 24 136 11C152 -2 166 23 182 10C198 -3 212 22 228 12C244 2 258 20 274 11C290 2 304 19 320 12C336 5 350 17 366 13C378 9 388 15 398 12"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 // A loose, hand-drawn smiley face.
 function DoodleSmiley({ className = '' }) {
   return (
@@ -646,6 +773,89 @@ function JokeOfTheDay() {
         New joke
       </button>
     </div>
+  )
+}
+
+// Auto-fetches GITHUB_USERNAME's repos from the GitHub API, most recently
+// updated first, and renders them as project cards. A sentinel div at the
+// bottom is watched with an IntersectionObserver — scrolling it into view
+// loads the next page, so the list keeps growing as the user scrolls.
+function ProjectsList() {
+  const PER_PAGE = 10
+  const [repos, setRepos] = useState([])
+  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(true)
+  const [done, setDone] = useState(false)
+  const [error, setError] = useState(false)
+  const sentinelRef = useRef(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    fetch(
+      `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=${PER_PAGE}&page=${page}`
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error('repo fetch failed')
+        return res.json()
+      })
+      .then((data) => {
+        if (cancelled) return
+        setRepos((prev) => [...prev, ...data])
+        if (!Array.isArray(data) || data.length < PER_PAGE) setDone(true)
+      })
+      .catch(() => {
+        if (!cancelled) setError(true)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [page])
+
+  useEffect(() => {
+    const node = sentinelRef.current
+    if (!node || done || error) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setPage((p) => p + 1)
+          }
+        })
+      },
+      { rootMargin: '300px' }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [done, error])
+
+  return (
+    <>
+      <div className="project-list">
+        {repos.map((r) => (
+          <a className="project-card" key={r.id} href={r.html_url} target="_blank" rel="noreferrer">
+            <div className="project-head">
+              <span className="project-name">{r.name}</span>
+              <span className="project-arrow">↗</span>
+            </div>
+            <p className="project-desc">{r.description || 'No description yet.'}</p>
+            <span className="project-link">
+              {r.language ? `${r.language} · ` : ''}★ {r.stargazers_count} · github ↗
+            </span>
+          </a>
+        ))}
+      </div>
+
+      {error && <p className="overlay-sub">Couldn't load repositories from GitHub right now.</p>}
+      {!error && loading && <p className="overlay-sub project-list-status">Loading repos…</p>}
+      {!error && !done && <div ref={sentinelRef} className="project-list-sentinel" aria-hidden="true" />}
+      {!error && done && repos.length === 0 && !loading && (
+        <p className="overlay-sub">No public repositories found.</p>
+      )}
+    </>
   )
 }
 
@@ -795,17 +1005,14 @@ function SiteFooter() {
   return (
     <footer className="site-footer">
       <p className="site-footer-text">
-        Built and designed by Sawyer. By viewing this page you agree to the terms and service.
+        By viewing this page you agree to the{' '}
+        <a className="footer-link" href="#" target="_blank" rel="noreferrer">
+          terms and service
+        </a>
+        . <a className="footer-link" href="#" target="_blank" rel="noreferrer">
+          Source code
+        </a>
       </p>
-      <nav className="footer-links" aria-label="Quick links">
-        <a className="footer-link" href="#" target="_blank" rel="noreferrer">
-          Terms and Conditions
-        </a>
-        <span className="footer-link-sep" aria-hidden="true">·</span>
-        <a className="footer-link" href="#" target="_blank" rel="noreferrer">
-          Source Code
-        </a>
-      </nav>
     </footer>
   )
 }
@@ -884,25 +1091,8 @@ function Overlay({ type, onClose, commentsState }) {
         {type === 'projects' && (
           <>
             <h2 className="overlay-title">Projects</h2>
-            <p className="overlay-sub">Placeholder projects — swap PROJECTS in App.jsx for the real list.</p>
-            <div className="project-list">
-              {PROJECTS.map((p) => (
-                <a
-                  className="project-card"
-                  key={p.name}
-                  href={p.github}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <div className="project-head">
-                    <span className="project-name">{p.name}</span>
-                    <span className="project-arrow">↗</span>
-                  </div>
-                  <p className="project-desc">{p.description}</p>
-                  <span className="project-link">github ↗</span>
-                </a>
-              ))}
-            </div>
+            <p className="overlay-sub">Live from GitHub — most recently updated first. Scroll for more.</p>
+            <ProjectsList />
           </>
         )}
       </div>
@@ -993,8 +1183,8 @@ export default function App() {
 
           <ViewCounter />
           <div className="fx-controls">
-            <SoundToggle />
             <FxToggle enabled={show3D} onToggle={() => setShow3D((v) => !v)} />
+            <SoundToggle />
           </div>
 
           <main className="content" ref={interactiveRef}>
@@ -1029,15 +1219,21 @@ export default function App() {
               ))}
             </Reveal>
 
-            <Reveal as="div" className="photo-row">
-              <PhotoSticker src="/sawyerstats.png" className="photo-sticker-sm rotate-left" />
+            <Reveal as="div">
+              <GitHubStats />
             </Reveal>
 
             <Reveal as="section" className="links" aria-label="Social links">
-              <p className="links-intro">
-                Follow me. <span className="links-intro-soft">or not</span>
-                <DoodleSmiley className="links-intro-smiley" />
-              </p>
+              <div className="links-intro-row">
+                <PhotoSticker
+                  src="/sawyerstats.png"
+                  className="photo-sticker-sm rotate-left links-intro-photo"
+                />
+                <p className="links-intro">
+                  Follow me. <span className="links-intro-soft">or not</span>
+                  <DoodleSmiley className="links-intro-smiley" />
+                </p>
+              </div>
               {PROFILE.links.map((l) => (
                 <a
                   key={l.code}
@@ -1051,6 +1247,10 @@ export default function App() {
                   <span className="link-arrow">↗</span>
                 </a>
               ))}
+            </Reveal>
+
+            <Reveal as="div" className="section-scribble-wrap">
+              <DoodleScribble className="section-scribble" />
             </Reveal>
 
             <Reveal as="div" className="comments-row">
