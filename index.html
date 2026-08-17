@@ -7,13 +7,14 @@
     <!-- Adding color-scheme helps the browser optimize default UI elements before CSS loads -->
     <meta name="color-scheme" content="light dark" />
 
-    <title>Sawyer | Software Engineer & Athlete | Minnetonka, MN</title>
+    <title>Sawyer | Software Engineer & Track Athlete | Minnetonka</title>
     <meta
       name="description"
-      content="Portfolio and athletic profile of Sawyer, a software engineer and competitive cross country/track athlete based in Minnetonka, MN. View projects, races, and PRs."
+      content="Portfolio of Sawyer, a software engineer and competitive cross country and track athlete in Minnetonka, MN. View my coding projects and race PRs."
     />
     <meta name="author" content="Sawyer" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
     <!-- Standardized the canonical URL to match your vercel app domain -->
     <link rel="canonical" href="https://sawyer-sch1.vercel.app/" />
 
@@ -27,6 +28,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Sawyer" />
+
+    <!-- Core Web Vitals: Preload the main React script to drastically improve mobile load times -->
+    <link rel="modulepreload" href="/src/main.jsx" as="script" fetchpriority="high" />
 
     <!-- Open Graph (link previews on iMessage, Discord, Facebook, LinkedIn, etc.) -->
     <meta property="og:type" content="website" />
@@ -130,12 +134,18 @@
           This website serves as a central hub for both professional and athletic achievements. Here, you can explore detailed case studies of recent coding projects, view race results and upcoming track meets, and learn more about the fascinating intersection of technology and sports. We believe in the power of E-E-A-T (Experience, Expertise, Authoritativeness, and Trustworthiness). Therefore, transparency and communication are core values of this platform.
         </p>
         
-        <h2>Navigation & Important Links</h2>
-        <ul>
-          <li>To learn more about Sawyer's background, training regimen, or coding journey, please visit our <a href="/#about">About Page</a>.</li>
-          <li>If you are interested in collaboration, recruitment, or just want to connect, reach out directly via the <a href="/#contact">Contact Page</a>.</li>
-          <li>Explore specific coding repositories and case studies in the <a href="/#projects">Projects Section</a>.</li>
-        </ul>
+        <h2>Internal Linking & Navigation Strategy</h2>
+        <nav aria-label="Main Site Navigation">
+          <ul>
+            <li><a href="/">Home - Sawyer's Portfolio</a></li>
+            <li><a href="/#about">About Sawyer - Engineer & Athlete</a></li>
+            <li><a href="/#projects">Software Engineering Projects & Case Studies</a></li>
+            <li><a href="/#races">Athletic Profile & Race Results (800m, 1600m, 5K)</a></li>
+            <li><a href="/#contact">Contact & Recruitment Inquiries</a></li>
+            <li><a href="/#privacy">Privacy Policy</a></li>
+            <li><a href="/#terms">Terms of Service</a></li>
+          </ul>
+        </nav>
 
         <h2>External Profiles & Trust Signals</h2>
         <p>
