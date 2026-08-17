@@ -1259,7 +1259,7 @@ body.cursor-none * {
 .comments-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 11px;
   padding-top: 8px;
 }
 
@@ -1272,24 +1272,64 @@ body.cursor-none * {
   line-height: 1.3;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
 }
 
 @media (max-width: 640px) {
   .comments-heading {
     font-size: clamp(17px, 5.5vw, 22px);
     letter-spacing: 0.01em;
-    gap: 6px;
+    gap: 4px;
   }
 }
 
+/* Small inline photo box next to "Say hi" — sized and styled to match
+   .headline-photo-box / .links-intro-photo-box so it reads as the same
+   small detail used elsewhere on the page, just sitting next to this
+   heading instead. Replaces the old floating polaroid-style badge. */
+.comments-heading-photo-box {
+  width: 0.85em;
+  height: 0.85em;
+  flex-shrink: 0;
+  border: 1.5px solid var(--ink);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+  display: inline-flex;
+  transform: rotate(-3deg);
+}
+
+.comments-heading-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Wraps just the "Say hi" words so the hand-drawn underline can be
+   positioned relative to the text, independent of the photo box and
+   gif sitting alongside it. */
+.comments-heading-text {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 6px;
+}
+
 .comments-heading-lottie {
-  width: 46px;
-  height: 46px;
+  width: 30px;
+  height: 30px;
   display: inline-block;
   border: none;
   background: transparent;
   pointer-events: none;
+  margin-left: -2px;
+}
+
+@media (max-width: 640px) {
+  .comments-heading-lottie {
+    width: 26px;
+    height: 26px;
+  }
 }
 
 .comment-form,
@@ -1717,13 +1757,6 @@ body.cursor-none * {
   position: relative;
 }
 
-.comments-photo {
-  position: absolute;
-  top: -6px;
-  right: 0;
-  animation: badge-bob 4.5s ease-in-out infinite;
-}
-
 .cta-button-wrap {
   position: relative;
 }
@@ -1748,7 +1781,6 @@ body.cursor-none * {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .comments-photo,
   .cta-photo-badge {
     animation: none;
   }
@@ -1760,10 +1792,6 @@ body.cursor-none * {
   }
   .photo-sticker-sm {
     width: 60px;
-  }
-  .comments-photo {
-    top: -4px;
-    right: -2px;
   }
   .cta-photo-badge {
     top: -12px;
