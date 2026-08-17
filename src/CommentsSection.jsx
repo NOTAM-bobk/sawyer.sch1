@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // Point this at your deployed Cloudflare Worker's /comments route (see
 // cloudflare-worker/README.md). Leave blank to hide the whole feature.
@@ -67,6 +67,71 @@ function EmojiWave() {
       loop
       aria-hidden="true"
     />
+  )
+}
+
+// Hand-drawn underline that draws itself under "Say hi" — same effect
+// as the one under "Follow me." on the main page (kept as a local copy
+// here rather than a shared import, since App.jsx already imports this
+// file and a reverse import would create a circular dependency). Only
+// draws in the first time it scrolls into view while scrolling DOWN.
+function HeadingUnderline({ className = '' }) {
+  const ref = useRef(null)
+  const [active, setActive] = useState(false)
+  const lastYRef = useRef(0)
+  const directionRef = useRef('down')
+
+  useEffect(() => {
+    lastYRef.current = window.scrollY || 0
+    function onScroll() {
+      const y = window.scrollY || 0
+      if (y > lastYRef.current + 1) directionRef.current = 'down'
+      else if (y < lastYRef.current - 1) directionRef.current = 'up'
+      lastYRef.current = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setActive(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && directionRef.current === 'down') {
+            setActive(true)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.7 }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <svg
+      ref={ref}
+      className={`doodle underline-doodle ${active ? 'is-active' : ''} ${className}`}
+      viewBox="0 0 200 20"
+      fill="none"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <path
+        pathLength="1"
+        d="M3 12C24 4 40 17 58 9C76 1 92 15 110 8C128 1 144 14 162 8C174 4 184 9 197 7"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
   )
 }
 
@@ -276,7 +341,13 @@ export default function CommentsSection({ state, onViewAll }) {
   return (
     <section className="comments-section" aria-label="Comments">
       <h2 className="comments-heading">
-        Say hi
+        <span className="comments-heading-photo-box">
+          <img src="/sawyerhi.png" alt="" className="comments-heading-photo" />
+        </span>
+        <span className="comments-heading-text">
+          Say hi
+          <HeadingUnderline />
+        </span>
         <EmojiWave />
       </h2>
 
