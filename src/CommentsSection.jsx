@@ -9,7 +9,7 @@ const VISIBLE_COUNT = 5
 // Points at /public/emoji.lottie. Lets the little animation next to
 // "Say hi" be swapped out just by dropping a different .lottie file in
 // public/ with this same name.
-const EMOJI_LOTTIE_SRC = '/emoji.lottie'
+const EMOJI_LOTTIE_SRC = '/emoji.gif'
 const DOTLOTTIE_PLAYER_SCRIPT = 'https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs'
 
 let dotlottieLoadPromise = null
