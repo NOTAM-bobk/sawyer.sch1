@@ -1535,10 +1535,6 @@ export default function App() {
 
             <Reveal as="div" className="comments-row">
               <CommentsSection state={commentsState} onViewAll={() => setActivePanel('comments')} />
-              {/* Sits near the "Say hi" heading inside CommentsSection.jsx.
-                  If that heading text is different, move .comments-photo's
-                  CSS anchor to match. */}
-              <PhotoSticker src="/sawyerhi.png" className="photo-sticker-sm rotate-right comments-photo" />
             </Reveal>
 
             <Reveal as="div">
