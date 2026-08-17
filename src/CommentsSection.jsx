@@ -6,6 +6,62 @@ export const COMMENTS_API_URL = 'https://sawyer-view-counter.sawyerbobk563.worke
 
 const VISIBLE_COUNT = 5
 
+// Points at /public/emoji.lottie. Lets the little animation next to
+// "Say hi" be swapped out just by dropping a different .lottie file in
+// public/ with this same name.
+const EMOJI_LOTTIE_SRC = '/emoji.lottie'
+const DOTLOTTIE_PLAYER_SCRIPT = 'https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs'
+
+let dotlottieLoadPromise = null
+function loadDotLottiePlayer() {
+  if (typeof window === 'undefined') return Promise.resolve()
+  if (window.customElements?.get('dotlottie-player')) return Promise.resolve()
+  if (!dotlottieLoadPromise) {
+    dotlottieLoadPromise = new Promise((resolve) => {
+      const script = document.createElement('script')
+      script.type = 'module'
+      script.src = DOTLOTTIE_PLAYER_SCRIPT
+      script.onload = () => resolve()
+      script.onerror = () => resolve() // fail quietly — the icon just won't render
+      document.head.appendChild(script)
+    })
+  }
+  return dotlottieLoadPromise
+}
+
+// Small looping animation that sits right next to the "Say hi" heading.
+// Loads the <dotlottie-player> web component on demand (no bundler
+// plugin needed) and points it at /emoji.lottie. Renders nothing until
+// the player is ready, and nothing at all if the script fails to load.
+function EmojiWave() {
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    loadDotLottiePlayer().then(() => {
+      if (!cancelled) setReady(true)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (!ready) return null
+
+  const reducedMotion =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  return (
+    <dotlottie-player
+      className="comments-heading-lottie"
+      src={EMOJI_LOTTIE_SRC}
+      autoplay={!reducedMotion}
+      loop={!reducedMotion}
+      aria-hidden="true"
+    />
+  )
+}
+
 function timeAgo(ts) {
   const seconds = Math.max(1, Math.floor((Date.now() - ts) / 1000))
   const units = [
@@ -211,7 +267,10 @@ export default function CommentsSection({ state, onViewAll }) {
 
   return (
     <section className="comments-section" aria-label="Comments">
-      <h2 className="comments-heading">Say hi</h2>
+      <h2 className="comments-heading">
+        Say hi
+        <EmojiWave />
+      </h2>
 
       <CommentComposer onSubmit={addComment} />
 
