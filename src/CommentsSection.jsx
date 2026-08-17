@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 
+// Point this at your deployed Cloudflare Worker's /comments route (see
+// cloudflare-worker/README.md). Leave blank to hide the whole feature.
+export const COMMENTS_API_URL = 'https://sawyer-view-counter.sawyerbobk563.workers.dev/comments'
+
+const VISIBLE_COUNT = 5
+
 // Small looping animation that sits right next to the "Say hi" heading,
 // embedded via lottie.host's own /embed/ page per the current source URL.
 const EMOJI_LOTTIE_SRC = 'https://lottie.host/embed/0e75a15e-3e21-4b28-a914-478f0e35fc7d/1lRLi1GCME.lottie'
