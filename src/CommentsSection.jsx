@@ -70,6 +70,28 @@ function EmojiWave() {
   )
 }
 
+// Small hand-drawn squiggle that sits directly above "Say hi" — mirrors
+// the one above "Follow me." on the main page so both section headings
+// share the same "squiggle, then heading" rhythm. Kept as a local copy
+// for the same reason as HeadingUnderline (see below).
+function HeadingSquiggle({ className = '' }) {
+  return (
+    <svg
+      className={`doodle comments-heading-squiggle ${className}`}
+      viewBox="0 0 160 20"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M2 14C14 4 22 18 34 9C46 0 54 17 66 8C78 -1 86 16 98 7C110 -2 118 15 130 7C138 1 144 10 158 6"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 // Hand-drawn underline that draws itself under "Say hi" — same effect
 // as the one under "Follow me." on the main page (kept as a local copy
 // here rather than a shared import, since App.jsx already imports this
@@ -340,6 +362,7 @@ export default function CommentsSection({ state, onViewAll }) {
 
   return (
     <section className="comments-section" aria-label="Comments">
+      <HeadingSquiggle />
       <h2 className="comments-heading">
         <span className="comments-heading-photo-box">
           <img src="/sawyerhi.png" alt="" className="comments-heading-photo" />
