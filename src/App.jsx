@@ -948,6 +948,71 @@ function ScrollDoodleArrow({ className = '' }) {
   )
 }
 
+// Hand-drawn underline that sits under "Follow me." and draws itself in
+// the first time it scrolls into view — but ONLY if the visitor is
+// scrolling down when it arrives. If they scroll back up to it later
+// (having already passed it), it stays put once drawn; if they hit it
+// by scrolling up before ever seeing it scrolling down, it waits.
+function ScrollUnderline({ className = '' }) {
+  const ref = useRef(null)
+  const [active, setActive] = useState(false)
+  const lastYRef = useRef(0)
+  const directionRef = useRef('down')
+
+  useEffect(() => {
+    lastYRef.current = window.scrollY || 0
+    function onScroll() {
+      const y = window.scrollY || 0
+      if (y > lastYRef.current + 1) directionRef.current = 'down'
+      else if (y < lastYRef.current - 1) directionRef.current = 'up'
+      lastYRef.current = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setActive(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && directionRef.current === 'down') {
+            setActive(true)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.7 }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <svg
+      ref={ref}
+      className={`doodle underline-doodle ${active ? 'is-active' : ''} ${className}`}
+      viewBox="0 0 200 20"
+      fill="none"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <path
+        pathLength="1"
+        d="M3 12C24 4 40 17 58 9C76 1 92 15 110 8C128 1 144 14 162 8C174 4 184 9 197 7"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 // Solid little card that pulls a random joke from the official-joke-api
 // and lets the visitor fetch another one on demand.
 function JokeOfTheDay() {
@@ -1442,7 +1507,11 @@ export default function App() {
                 <span className="links-intro-photo-box">
                   <img src="/sawyerstats.png" alt="" className="links-intro-photo" />
                 </span>
-                Follow me. <span className="links-intro-soft">or not</span>
+                <span className="links-intro-text">
+                  Follow me.
+                  <ScrollUnderline />
+                </span>
+                <span className="links-intro-soft">or not</span>
                 <DoodleSmiley className="links-intro-smiley" />
               </p>
               {PROFILE.links.map((l) => (
