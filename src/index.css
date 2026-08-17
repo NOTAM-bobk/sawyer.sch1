@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+Spray+Paint&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Changa+One&family=Rubik+Spray+Paint&family=VT323&display=swap');
 
 :root {
   --bg: #f2e6c8;
@@ -21,6 +21,8 @@
      "Say hi" section headings. */
   --font-spray: 'Rubik Spray Paint', var(--font-display);
   --font-blackops: 'Black Ops One', var(--font-display);
+  /* Used for the bio line under the "Sawyer" headline name. */
+  --font-changa: 'Changa One', var(--font-display);
 }
 
 * {
@@ -495,10 +497,24 @@ body.cursor-none * {
 
 .bio {
   max-width: 520px;
+  font-family: var(--font-changa);
   font-size: clamp(15px, 2vw, 17px);
   line-height: 1.65;
   color: var(--ink-soft);
   margin: 0;
+}
+
+/* Small label sat above a stats row (e.g. "PRs" above the running
+   stats, "GitHub" above the GitHub stats) in the same blocky/stencil
+   face used for the view counter. */
+.section-kicker {
+  font-family: var(--font-blackops);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-faint);
+  margin: 0 0 8px;
 }
 
 .stats {
@@ -534,6 +550,23 @@ body.cursor-none * {
   letter-spacing: 0.06em;
   color: var(--ink-faint);
   text-align: center;
+}
+
+/* Inline photo boxes (next to "Welcome, I'm", "Follow me.", and "Say
+   hi") read a little too small on phones, so bump them up slightly
+   relative to their heading text — not a big jump, just enough to
+   read clearly at mobile sizes. */
+@media (max-width: 640px) {
+  .headline-photo-box,
+  .links-intro-photo-box {
+    width: 1.15em;
+    height: 1.15em;
+  }
+
+  .comments-heading-photo-box {
+    width: 1.05em;
+    height: 1.05em;
+  }
 }
 
 @media (max-width: 640px) {
@@ -2047,6 +2080,42 @@ body.cursor-none * {
 .emoji-rain-sentinel {
   width: 100%;
   height: 1px;
+}
+
+/* Greys out and blurs the page behind the emoji rain, then clears once
+   the rain finishes. Sits just under the emoji layer's z-index so the
+   emoji stay crisp on top of the blurred backdrop. Duration/timing is
+   keyed to RAIN_LIFETIME_MS (3s) in App.jsx. */
+.emoji-rain-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: rgba(40, 37, 30, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: emoji-rain-backdrop-fade 3s ease both;
+}
+
+@keyframes emoji-rain-backdrop-fade {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emoji-rain-backdrop {
+    display: none;
+  }
 }
 
 .emoji-rain {
