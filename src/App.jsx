@@ -7,7 +7,7 @@ import AnimalCompanion from './AnimalCompanion.jsx'
 // ---------------------------------------------------------------------------
 const PROFILE = {
   name: 'Sawyer',
-  schools: 'Yinghua Academy > Minnetonka High School 29'',
+  schools: 'Yinghua Academy > Minnetonka High School 2029',
   bio:
     "I think i am suposted to write something here... " +
     "idk what, so i am going to leave , " +
