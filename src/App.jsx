@@ -66,6 +66,21 @@ const QUOTES = [
   'do it scared',
   'progress over perfect',
 ]
+
+// Scrolling strip of languages/tools shown under the GitHub stats. Drop a
+// matching image in /public/languages/ (any square-ish icon works — svg,
+// png, whatever) and add a line here. Remove a line to drop one. Nothing
+// else needs to change — the strip just loops through whatever's in this
+// array.
+const LANGUAGES = [
+  { name: 'JavaScript', icon: '/languages/javascript.png' },
+  { name: 'TypeScript', icon: '/languages/typescript.png' },
+  { name: 'Python', icon: '/languages/python.png' },
+  { name: 'React', icon: '/languages/react.png' },
+  { name: 'HTML', icon: '/languages/html.png' },
+  { name: 'CSS', icon: '/languages/css.png' },
+  { name: 'Node.js', icon: '/languages/nodejs.png' },
+]
 // ---------------------------------------------------------------------------
 
 function DotGrid() {
@@ -271,6 +286,98 @@ function useCountUp(target, { duration = 1400, start = false } = {}) {
   return value
 }
 
+// Turns a "m:ss" string like "4:28" into total seconds, or null if the
+// string isn't in that shape (e.g. the "??" marathon placeholder).
+function parseClockValue(str) {
+  const match = /^(\d{1,3}):(\d{2})$/.exec(String(str).trim())
+  if (!match) return null
+  return parseInt(match[1], 10) * 60 + parseInt(match[2], 10)
+}
+
+function formatClockValue(totalSeconds) {
+  const mins = Math.floor(totalSeconds / 60)
+  const secs = Math.max(0, Math.round(totalSeconds % 60))
+  return `${mins}:${String(secs).padStart(2, '0')}`
+}
+
+// Plays each top stat as a countdown once `start` flips true: it opens on
+// a padded, higher number and counts down to the real time, fast at
+// first and then easing into a crawl right as it settles on the real
+// value — like a stopwatch winding down. Values that aren't in "m:ss"
+// shape (the "??" marathon placeholder) are left untouched.
+function useCountdownStat(target, { start = false, duration = 1900 } = {}) {
+  const targetSeconds = parseClockValue(target)
+  const [display, setDisplay] = useState(target)
+
+  useEffect(() => {
+    if (!start || targetSeconds == null) {
+      setDisplay(target)
+      return
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setDisplay(target)
+      return
+    }
+    const startSeconds = targetSeconds * 1.6 + 20
+    let raf
+    const startTime = performance.now()
+    function tick(now) {
+      const progress = Math.min((now - startTime) / duration, 1)
+      const eased = 1 - Math.pow(1 - progress, 3) // fast start, slows near the end
+      const current = startSeconds - (startSeconds - targetSeconds) * eased
+      setDisplay(progress < 1 ? formatClockValue(current) : target)
+      if (progress < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [target, targetSeconds, start, duration])
+
+  return display
+}
+
+function CountdownStat({ value, label, start }) {
+  const display = useCountdownStat(value, { start })
+  return (
+    <div className="stat">
+      <span className="stat-value">{display}</span>
+      <span className="stat-label">{label}</span>
+    </div>
+  )
+}
+
+// Wraps PROFILE.stats, watches for the row scrolling into view, and kicks
+// off every CountdownStat's countdown at once.
+function StatsRow({ stats }) {
+  const [started, setStarted] = useState(false)
+  const rowRef = useRef(null)
+
+  useEffect(() => {
+    const node = rowRef.current
+    if (!node) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setStarted(true)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.3 }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <div className="stats" ref={rowRef} aria-label="Stats">
+      {stats.map((s) => (
+        <CountdownStat key={s.label} value={s.value} label={s.label} start={started} />
+      ))}
+    </div>
+  )
+}
+
 // Live GitHub stats — lifetime contributions and public repo count for
 // GITHUB_USERNAME. Repo count comes straight from the GitHub REST API
 // (api.github.com/users/:user). Lifetime contributions aren't exposed by
@@ -357,6 +464,37 @@ function GitHubStats() {
       <div className="stat">
         <span className="stat-value">{data ? repos.toLocaleString() : '—'}</span>
         <span className="stat-label">REPOSITORIES</span>
+      </div>
+    </div>
+  )
+}
+
+// A single icon in the language strip. Quietly disappears if its image
+// hasn't been added to /public/languages/ yet, instead of showing a
+// broken-image icon.
+function LanguageIcon({ src, name }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) return null
+  return (
+    <span className="language-pill" title={name}>
+      <img src={src} alt={name} className="language-pill-img" onError={() => setFailed(true)} />
+    </span>
+  )
+}
+
+// Endless-scrolling strip of language/tool icons, sat right under the
+// GitHub stats. The list is duplicated once so the CSS animation can
+// loop seamlessly — add or remove entries in LANGUAGES above and this
+// just keeps working.
+function LanguageCarousel({ languages }) {
+  if (!languages || languages.length === 0) return null
+  const track = [...languages, ...languages]
+  return (
+    <div className="language-carousel" aria-label="Languages I use">
+      <div className="language-carousel-track">
+        {track.map((l, i) => (
+          <LanguageIcon key={`${l.name}-${i}`} src={l.icon} name={l.name} />
+        ))}
       </div>
     </div>
   )
@@ -1037,8 +1175,10 @@ function Overlay({ type, onClose, commentsState }) {
 
   if (!type) return null
 
+  const lined = type === 'challenges' || type === 'projects'
+
   return (
-    <div className="overlay" role="dialog" aria-modal="true">
+    <div className={`overlay ${lined ? 'overlay-lined' : ''}`} role="dialog" aria-modal="true">
       <div className="overlay-bar">
         <button className="overlay-back" onClick={onClose}>
           <span aria-hidden="true">←</span> Back
@@ -1214,30 +1354,24 @@ export default function App() {
               <ScrollDoodleArrow className="hero-scroll-arrow" />
             </Reveal>
 
-            <Reveal as="section" className="stats" aria-label="Stats">
-              {PROFILE.stats.map((s) => (
-                <div className="stat" key={s.label}>
-                  <span className="stat-value">{s.value}</span>
-                  <span className="stat-label">{s.label}</span>
-                </div>
-              ))}
+            <Reveal as="section">
+              <StatsRow stats={PROFILE.stats} />
             </Reveal>
 
-            <Reveal as="div">
+            <Reveal as="div" className="github-block">
               <GitHubStats />
+              <LanguageCarousel languages={LANGUAGES} />
             </Reveal>
 
             <Reveal as="section" className="links" aria-label="Social links">
-              <div className="links-intro-row">
-                <PhotoSticker
-                  src="/sawyerstats.png"
-                  className="photo-sticker-sm rotate-left links-intro-photo"
-                />
-                <p className="links-intro">
-                  Follow me. <span className="links-intro-soft">or not</span>
-                  <DoodleSmiley className="links-intro-smiley" />
-                </p>
-              </div>
+              <DoodleSquiggle className="links-top-squiggle" />
+              <p className="links-intro">
+                <span className="links-intro-photo-box">
+                  <img src="/sawyerstats.png" alt="" className="links-intro-photo" />
+                </span>
+                Follow me. <span className="links-intro-soft">or not</span>
+                <DoodleSmiley className="links-intro-smiley" />
+              </p>
               {PROFILE.links.map((l) => (
                 <a
                   key={l.code}
