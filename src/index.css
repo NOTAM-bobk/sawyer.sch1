@@ -1295,8 +1295,10 @@ body.cursor-none * {
 /* Small squiggle directly above "Say hi" — mirrors .links-top-squiggle
    above "Follow me." so both section headings share the same rhythm. */
 .comments-heading-squiggle {
-  width: 170px;
-  height: 21px;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  aspect-ratio: 160 / 20;
   margin-bottom: 8px;
   color: var(--ink);
 }
@@ -1357,21 +1359,22 @@ body.cursor-none * {
 }
 
 .comments-heading-lottie {
-  width: 22px;
-  height: 22px;
+  width: 17px;
+  height: 17px;
   flex-shrink: 0;
   display: inline-block;
   border: none;
   background: transparent;
   pointer-events: none;
-  margin-left: -4px;
+  margin-left: -6px;
+  overflow: hidden;
 }
 
 @media (max-width: 640px) {
   .comments-heading-lottie {
-    width: 19px;
-    height: 19px;
-    margin-left: -3px;
+    width: 15px;
+    height: 15px;
+    margin-left: -5px;
   }
 }
 
@@ -1909,8 +1912,10 @@ body.cursor-none * {
 /* -------------------------------------------------------------------- */
 
 .links-top-squiggle {
-  width: 170px;
-  height: 21px;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  aspect-ratio: 160 / 20;
   margin-bottom: 8px;
   color: var(--ink);
 }
@@ -2032,5 +2037,61 @@ body.cursor-none * {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* -------------------------------------------------------------------- */
+/* Bottom-of-page emoji rain                                            */
+/* -------------------------------------------------------------------- */
+
+.emoji-rain-sentinel {
+  width: 100%;
+  height: 1px;
+}
+
+.emoji-rain {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.emoji-rain-piece {
+  position: absolute;
+  top: 0;
+  line-height: 1;
+  will-change: transform, opacity;
+  animation: emoji-rain-fall 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* Falls in from above the viewport, holds at its resting spot once the
+   screen has filled (~1s, the 30%-70% span at this duration), then
+   continues falling on through the bottom of the screen while fading. */
+@keyframes emoji-rain-fall {
+  0% {
+    transform: translateY(-110vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(var(--rest-y)) rotate(var(--rotate));
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(var(--rest-y)) rotate(var(--rotate));
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(120vh) rotate(calc(var(--rotate) * 2));
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emoji-rain {
+    display: none;
   }
 }
