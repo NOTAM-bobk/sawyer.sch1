@@ -6,57 +6,19 @@ export const COMMENTS_API_URL = 'https://sawyer-view-counter.sawyerbobk563.worke
 
 const VISIBLE_COUNT = 5
 
-// Points at /public/emoji.lottie. Lets the little animation next to
-// "Say hi" be swapped out just by dropping a different .lottie file in
-// public/ with this same name.
-const EMOJI_LOTTIE_SRC = '/emoji.gif'
-const DOTLOTTIE_PLAYER_SCRIPT = 'https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs'
-
-let dotlottieLoadPromise = null
-function loadDotLottiePlayer() {
-  if (typeof window === 'undefined') return Promise.resolve()
-  if (window.customElements?.get('dotlottie-player')) return Promise.resolve()
-  if (!dotlottieLoadPromise) {
-    dotlottieLoadPromise = new Promise((resolve) => {
-      const script = document.createElement('script')
-      script.type = 'module'
-      script.src = DOTLOTTIE_PLAYER_SCRIPT
-      script.onload = () => resolve()
-      script.onerror = () => resolve() // fail quietly — the icon just won't render
-      document.head.appendChild(script)
-    })
-  }
-  return dotlottieLoadPromise
-}
+// lottie.host embed for the little animation next to "Say hi". Swap the
+// URL here if you re-export or replace the animation on lottie.host.
+const EMOJI_LOTTIE_EMBED_URL = 'https://lottie.host/embed/007801a2-c03c-47ae-acbe-3d19fa7d13a0/AcwEYzWVLg.lottie'
 
 // Small looping animation that sits right next to the "Say hi" heading.
-// Loads the <dotlottie-player> web component on demand (no bundler
-// plugin needed) and points it at /emoji.lottie. Renders nothing until
-// the player is ready, and nothing at all if the script fails to load.
 function EmojiWave() {
-  const [ready, setReady] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-    loadDotLottiePlayer().then(() => {
-      if (!cancelled) setReady(true)
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  if (!ready) return null
-
-  const reducedMotion =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
   return (
-    <dotlottie-player
+    <iframe
       className="comments-heading-lottie"
-      src={EMOJI_LOTTIE_SRC}
-      autoplay={!reducedMotion}
-      loop={!reducedMotion}
+      src={EMOJI_LOTTIE_EMBED_URL}
+      title=""
+      loading="lazy"
+      frameBorder="0"
       aria-hidden="true"
     />
   )
