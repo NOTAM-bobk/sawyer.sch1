@@ -1007,11 +1007,11 @@ function SiteFooter() {
   return (
     <footer className="site-footer">
       <p className="site-footer-text">
-        By viewing this page you agree to the{' '}
-        <a className="footer-link" href="#" target="_blank" rel="noreferrer">
+       Built and Designed By "SAWYER INC CORP" By viewing this page you agree to the{' '}
+        <a className="footer-link" href="https://www.gdprprivacynotice.com/sample-terms-conditions/" target="_blank" rel="noreferrer">
           terms and service
         </a>
-        . <a className="footer-link" href="#" target="_blank" rel="noreferrer">
+        . <a className="footer-link" href="https://github.com/NOTAM-bobk/sawyer.sch1/tree/main" target="_blank" rel="noreferrer">
           Source code
         </a>
       </p>
@@ -1048,7 +1048,7 @@ function Overlay({ type, onClose, commentsState }) {
           <>
             <h2 className="overlay-title">Challenges</h2>
             <p className="overlay-sub">
-              Placeholder challenges — swap CHALLENGES in App.jsx for the real list. Completed ones float to the top.
+              (just some)
             </p>
             <div className="challenge-grid">
               {[...CHALLENGES]
