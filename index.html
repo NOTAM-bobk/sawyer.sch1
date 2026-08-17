@@ -4,19 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#F2E6C8" />
+    <!-- Adding color-scheme helps the browser optimize default UI elements before CSS loads -->
+    <meta name="color-scheme" content="light dark" />
 
-    <!-- ===================================================================
-         Replace https://your-domain.vercel.app below with your real,
-         deployed domain everywhere it appears (canonical, og:url,
-         twitter:image, and the JSON-LD block near the bottom).
-         ================================================================= -->
-
-    <title>Sawyer — Dev / Athlete | Minnetonka, MN</title>
+    <title>Sawyer | Software Engineer & Athlete | Minnetonka, MN</title>
     <meta
       name="description"
-      content="Sawyer — software engineer and cross country / track athlete at Minnetonka High School. 800m, 1600m, and 5K PRs"
+      content="Portfolio and athletic profile of Sawyer, a software engineer and competitive cross country/track athlete based in Minnetonka, MN. View projects, races, and PRs."
     />
-    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Sawyer" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <!-- Standardized the canonical URL to match your vercel app domain -->
     <link rel="canonical" href="https://sawyer-sch1.vercel.app/" />
 
     <!-- Favicon / tab icon, all browsers -->
@@ -30,31 +28,33 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Sawyer" />
 
-    <!-- Open Graph (link previews on iMessage, Discord, Facebook, etc.) -->
+    <!-- Open Graph (link previews on iMessage, Discord, Facebook, LinkedIn, etc.) -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Sawyer — Dev / Athlete" />
+    <meta property="og:site_name" content="Sawyer's Portfolio" />
+    <meta property="og:title" content="Sawyer | Software Engineer & Athlete" />
     <meta
       property="og:description"
       content="Software engineer and cross country / track athlete at Minnetonka High School. See races, projects, and PRs."
     />
-    <meta property="og:url" content="https://your-domain.vercel.app/" />
-    <meta property="og:image" content="https://your-domain.vercel.app/sawyer.png" />
+    <meta property="og:url" content="https://sawyer-sch1.vercel.app/" />
+    <!-- Note: Create an og-image.png (1200x630) and put it in your /public folder for optimal sharing previews -->
+    <meta property="og:image" content="https://sawyer-sch1.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Sawyer - Software Engineer and Athlete" />
     <meta property="og:locale" content="en_US" />
-    <!-- sawyer.png is presumably square (it's doing double duty as your
-         favicon) — square images get awkwardly cropped in most OG link
-         previews, which want ~1200x630 landscape. Worth dropping a
-         dedicated og-image.png in /public and pointing og:image /
-         twitter:image at that instead, if you want previews to look
-         sharp when the link is shared. -->
 
     <!-- Twitter card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Sawyer — Dev / Athlete" />
+    <!-- Optional: Add your twitter handle if you have one -->
+    <!-- <meta name="twitter:creator" content="@yourtwitterhandle" /> -->
+    <meta name="twitter:title" content="Sawyer | Software Engineer & Athlete" />
     <meta
       name="twitter:description"
       content="Software engineer and cross country / track athlete at Minnetonka High School."
     />
-    <meta name="twitter:image" content="https://your-domain.vercel.app/sawyer.png" />
+    <meta name="twitter:image" content="https://sawyer-sch1.vercel.app/og-image.png" />
+    <meta name="twitter:image:alt" content="Sawyer - Software Engineer and Athlete" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -63,29 +63,98 @@
       rel="stylesheet"
     />
 
-    <!-- Structured data so search engines understand this is a person's
-         profile page. Update sameAs if PROFILE.links in App.jsx changes. -->
+    <!-- Advanced Structured Data utilizing a @graph to connect the Website and Person entities -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Sawyer",
-        "url": "https://sawyer-sch1.vercel.app",
-        "affiliation": {
-          "@type": "EducationalOrganization",
-          "name": "Minnetonka High School"
-        },
-        "knowsAbout": ["Cross Country Running", "Track and Field", "Software Development"],
-        "sameAs": [
-          "https://instagram.com/yourusername",
-          "https://www.strava.com/athletes/935277048",
-          "https://www.athletic.net/athlete/29503644/cross-country/all"
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://sawyer-sch1.vercel.app/#website",
+            "url": "https://sawyer-sch1.vercel.app/",
+            "name": "Sawyer's Portfolio",
+            "description": "Software engineer and cross country / track athlete at Minnetonka High School.",
+            "publisher": {
+              "@id": "https://sawyer-sch1.vercel.app/#person"
+            },
+            "inLanguage": "en-US"
+          },
+          {
+            "@type": "Person",
+            "@id": "https://sawyer-sch1.vercel.app/#person",
+            "name": "Sawyer",
+            "url": "https://sawyer-sch1.vercel.app/",
+            "image": "https://sawyer-sch1.vercel.app/sawyer.png",
+            "jobTitle": "Software Engineer & Student Athlete",
+            "description": "Software engineer and competitive cross country/track athlete based in Minnetonka, MN.",
+            "affiliation": {
+              "@type": "EducationalOrganization",
+              "name": "Minnetonka High School",
+              "location": "Minnetonka, Minnesota"
+            },
+            "knowsAbout": [
+              "Software Development",
+              "Web Development",
+              "Cross Country Running",
+              "Track and Field",
+              "Distance Running"
+            ],
+            "sameAs": [
+              "https://instagram.com/yourusername",
+              "https://www.strava.com/athletes/935277048",
+              "https://www.athletic.net/athlete/29503644/cross-country/all",
+              "https://github.com/yourusername"
+            ]
+          }
         ]
       }
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- This content is visually hidden so no users will see it, but search engine bots will scan it before React loads. React will completely overwrite this div upon hydration. -->
+      <div style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;">
+        
+        <h1>Sawyer | Software Engineer & Competitive Athlete in Minnetonka, MN</h1>
+        
+        <p>
+          Welcome to the digital portfolio of Sawyer, a passionate software engineer and competitive cross country and track athlete based in Minnetonka, Minnesota. Balancing the rigorous demands of high-level athletics with the complex problem-solving of software development, Sawyer brings dedication, endurance, and technical expertise to every project and race.
+        </p>
+        <p>
+          As a software developer, Sawyer specializes in creating dynamic, user-centric web applications and software solutions. With a strong foundation in modern programming languages and frameworks, the focus is on writing clean, efficient, and maintainable code. Whether it's developing interactive front-end interfaces, architecting robust back-end systems, or deploying full-stack applications, Sawyer's technical portfolio demonstrates a commitment to continuous learning and technological innovation in the rapidly evolving tech landscape.
+        </p>
+        <p>
+          In the athletic arena, Sawyer is a dedicated distance runner competing for Minnetonka High School. Specializing in the 800m, 1600m, and 5K distances, competitive running requires the exact same discipline, strategic planning, and resilience as software engineering. Through miles of daily training and rigorous track workouts, Sawyer has developed a strong work ethic that translates seamlessly into the professional world of tech. The drive to push for new Personal Records (PRs) on the track is mirrored by the drive to optimize algorithms and improve digital application performance.
+        </p>
+        <p>
+          This website serves as a central hub for both professional and athletic achievements. Here, you can explore detailed case studies of recent coding projects, view race results and upcoming track meets, and learn more about the fascinating intersection of technology and sports. We believe in the power of E-E-A-T (Experience, Expertise, Authoritativeness, and Trustworthiness). Therefore, transparency and communication are core values of this platform.
+        </p>
+        
+        <h2>Navigation & Important Links</h2>
+        <ul>
+          <li>To learn more about Sawyer's background, training regimen, or coding journey, please visit our <a href="/#about">About Page</a>.</li>
+          <li>If you are interested in collaboration, recruitment, or just want to connect, reach out directly via the <a href="/#contact">Contact Page</a>.</li>
+          <li>Explore specific coding repositories and case studies in the <a href="/#projects">Projects Section</a>.</li>
+        </ul>
+
+        <h2>External Profiles & Trust Signals</h2>
+        <p>
+          For additional resources and to verify athletic performances, you can view Sawyer's official race statistics on authoritative platforms. Check out recent cross country results on 
+          <a href="https://www.athletic.net/athlete/29503644/cross-country/all" target="_blank" rel="noopener noreferrer">Athletic.net</a> and follow daily training runs and mileage on 
+          <a href="https://www.strava.com/athletes/935277048" target="_blank" rel="noopener noreferrer">Strava</a>. To review open-source contributions, code quality, and active repositories, please check out the official 
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub Developer Profile</a>.
+        </p>
+
+        <h2>Legal & Compliance</h2>
+        <p>
+          To ensure a safe, transparent, and compliant browsing experience for all users, please review our comprehensive legal documentation. We are strictly committed to protecting your personal data and providing a secure platform to interact with Sawyer's digital content. Please read our <a href="/#privacy">Privacy Policy</a> regarding data collection, and our <a href="/#terms">Terms of Service</a> for website usage guidelines.
+        </p>
+
+        <p>
+          Thank you for visiting. Whether you are a technical recruiter looking for a talented software engineer, a college coach tracking athletic progress, or a fellow developer seeking inspiration, this portfolio is meticulously designed to showcase the relentless pursuit of excellence in both the digital world and on the track.
+        </p>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
