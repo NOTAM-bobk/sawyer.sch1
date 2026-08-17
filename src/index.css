@@ -815,22 +815,30 @@ body.cursor-none * {
 .cta-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 10px;
   margin-top: 8px;
   margin-bottom: 36px;
 }
 
 .cta-button {
-  font-family: var(--font-display);
-  font-size: clamp(16px, 2.4vw, 20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: clamp(14.5px, 1.9vw, 16px);
   letter-spacing: -0.01em;
   color: var(--ink);
-  background: transparent;
-  border: 1.5px solid var(--ink);
-  border-radius: 8px;
-  padding: 22px 18px;
+  background: rgba(var(--bg-rgb), 0.6);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 1px 2px rgba(23, 20, 15, 0.05);
+  transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.15s ease;
   /* .cta-button is a plain <button>, which is inline-block by default.
      The "Challenges" button sits directly in the cta-row grid, so it
      naturally stretches to fill its column — but the "Projects" button
@@ -839,16 +847,31 @@ body.cursor-none * {
      keeps both buttons exactly the same length on every screen size. */
   width: 100%;
   box-sizing: border-box;
-  display: block;
+}
+
+.cta-button-arrow {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--ink-faint);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
 }
 
 .cta-button:hover {
   background: var(--ink);
   color: var(--bg);
+  border-color: var(--ink);
+  box-shadow: 0 6px 18px rgba(23, 20, 15, 0.14);
+  transform: translateY(-1px);
+}
+
+.cta-button:hover .cta-button-arrow {
+  color: var(--bg);
+  transform: translateX(3px);
 }
 
 .cta-button:active {
-  transform: scale(0.98);
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 1px 2px rgba(23, 20, 15, 0.08);
 }
 
 @media (max-width: 560px) {
@@ -856,7 +879,7 @@ body.cursor-none * {
     grid-template-columns: 1fr;
   }
   .cta-button {
-    padding: 18px 16px;
+    padding: 15px 16px;
   }
 }
 
@@ -1263,6 +1286,15 @@ body.cursor-none * {
   padding-top: 8px;
 }
 
+/* Small squiggle directly above "Say hi" — mirrors .links-top-squiggle
+   above "Follow me." so both section headings share the same rhythm. */
+.comments-heading-squiggle {
+  width: 110px;
+  height: 13px;
+  margin-bottom: 8px;
+  color: var(--ink-faint);
+}
+
 .comments-heading {
   margin: 0;
   font-family: var(--font-blackops);
@@ -1272,13 +1304,14 @@ body.cursor-none * {
   line-height: 1.3;
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: 5px;
 }
 
 @media (max-width: 640px) {
   .comments-heading {
-    font-size: clamp(17px, 5.5vw, 22px);
-    letter-spacing: 0.01em;
+    font-size: clamp(16px, 5.2vw, 22px);
+    letter-spacing: 0.005em;
     gap: 4px;
   }
 }
@@ -1308,27 +1341,31 @@ body.cursor-none * {
 
 /* Wraps just the "Say hi" words so the hand-drawn underline can be
    positioned relative to the text, independent of the photo box and
-   gif sitting alongside it. */
+   gif sitting alongside it. white-space: nowrap keeps "Say" and "hi"
+   from breaking onto two lines on narrow phones. */
 .comments-heading-text {
   position: relative;
   display: inline-block;
+  white-space: nowrap;
   padding-bottom: 6px;
 }
 
 .comments-heading-lottie {
-  width: 30px;
-  height: 30px;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
   display: inline-block;
   border: none;
   background: transparent;
   pointer-events: none;
-  margin-left: -2px;
+  margin-left: -4px;
 }
 
 @media (max-width: 640px) {
   .comments-heading-lottie {
-    width: 26px;
-    height: 26px;
+    width: 19px;
+    height: 19px;
+    margin-left: -3px;
   }
 }
 
@@ -1636,18 +1673,28 @@ body.cursor-none * {
   opacity: 0;
   padding: 10px 14px;
   border-radius: 12px;
-  /* Frosted-glass panel — blurs the dot grid / whatever's directly
-     behind the text so it stays legible without needing a solid, more
-     visually heavy background. */
+  /* Frosted-glass panel — blurs whatever's directly behind the text so
+     it stays legible without needing a solid, more visually heavy
+     background. */
   background: rgba(var(--bg-rgb), 0.45);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  transition: opacity 0.9s ease;
+  box-shadow: none;
+  transition: opacity 0.9s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* While a quote is actively typing/holding, lift it above the rest of
+   the page content (not just the dot-grid background) and turn up the
+   blur/opacity so it reads as a proper frosted card sitting in front of
+   whatever text or UI happens to be behind it in that corner. */
 .quote-whisper-typing,
 .quote-whisper-holding {
   opacity: 1;
+  z-index: 40;
+  background: rgba(var(--bg-rgb), 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 8px 24px rgba(23, 20, 15, 0.14);
 }
 
 .quote-whisper-fading {
@@ -1850,6 +1897,13 @@ body.cursor-none * {
 /* -------------------------------------------------------------------- */
 /* "Follow me. or not" links intro                                      */
 /* -------------------------------------------------------------------- */
+
+.links-top-squiggle {
+  width: 110px;
+  height: 13px;
+  margin-bottom: 8px;
+  color: var(--ink-faint);
+}
 
 .links-intro {
   margin: 0 0 14px;
