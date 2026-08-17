@@ -292,6 +292,16 @@ body.cursor-none * {
   display: block;
 }
 
+.headline-photo-box,
+.links-intro-photo-box {
+  transition: transform 0.2s ease;
+}
+
+.headline-photo-box:hover,
+.links-intro-photo-box:hover {
+  transform: rotate(-3deg) scale(1.1);
+}
+
 /* -------------------------------------------------------------------- */
 /* Loading skeleton (shown until webfonts are ready)                    */
 /* -------------------------------------------------------------------- */
@@ -564,13 +574,21 @@ body.cursor-none * {
 .language-carousel-track {
   display: flex;
   align-items: center;
-  gap: 34px;
   width: max-content;
-  animation: language-scroll 24s linear infinite;
+  animation-name: language-scroll;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  /* animation-duration is set inline per render so the strip always
+     moves at the same pixel-per-second pace, however many icons or
+     copies it ends up needing. */
 }
 
-.language-carousel:hover .language-carousel-track {
-  animation-play-state: paused;
+.language-carousel-set {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  flex-shrink: 0;
+  padding-right: 34px;
 }
 
 .language-pill {
@@ -601,9 +619,10 @@ body.cursor-none * {
     transform: translateX(0);
   }
   to {
-    /* Track is the language list duplicated once, so -50% is exactly
-       one full loop and the animation restarts seamlessly. */
-    transform: translateX(-50%);
+    /* Shifts by exactly the measured width of one full icon set (plus
+       its trailing gap), so wherever the loop resets, the next copy is
+       already sitting in the exact spot the first one started in. */
+    transform: translateX(calc(-1 * var(--carousel-set-width)));
   }
 }
 
@@ -618,8 +637,9 @@ body.cursor-none * {
     width: 32px;
     height: 32px;
   }
-  .language-carousel-track {
+  .language-carousel-set {
     gap: 24px;
+    padding-right: 24px;
   }
 }
 
@@ -1295,6 +1315,24 @@ body.cursor-none * {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  animation: comment-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes comment-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comment-item {
+    animation: none;
+  }
 }
 
 .comment-head {
@@ -1501,7 +1539,7 @@ body.cursor-none * {
   font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.5;
-  color: var(--ink-faint);
+  color: var(--ink);
   pointer-events: none;
   user-select: none;
   opacity: 0;
@@ -1524,7 +1562,7 @@ body.cursor-none * {
   width: 1px;
   height: 10px;
   margin-left: 2px;
-  background: var(--ink-faint);
+  background: var(--ink);
   vertical-align: -1px;
   animation: quote-blink 1s steps(1) infinite;
 }
@@ -1623,6 +1661,7 @@ body.cursor-none * {
   position: absolute;
   top: -6px;
   right: 0;
+  animation: badge-bob 4.5s ease-in-out infinite;
 }
 
 .cta-button-wrap {
@@ -1634,6 +1673,25 @@ body.cursor-none * {
   top: -16px;
   right: -12px;
   z-index: 2;
+  animation: badge-bob 4.5s ease-in-out infinite;
+  animation-delay: -2.2s;
+}
+
+@keyframes badge-bob {
+  0%,
+  100% {
+    transform: rotate(3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3deg) translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comments-photo,
+  .cta-photo-badge {
+    animation: none;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1714,6 +1772,30 @@ body.cursor-none * {
   font-size: clamp(18px, 2.6vw, 22px);
   letter-spacing: -0.01em;
   color: var(--ink);
+}
+
+/* Sized to match .headline-photo-box at the top of the page, so the
+   little photo sitting next to "Follow me." — right above the comments
+   section — reads as the same small, consistent detail rather than a
+   full-size, unstyled image. */
+.links-intro-photo-box {
+  width: 0.95em;
+  height: 0.95em;
+  flex-shrink: 0;
+  border: 1.5px solid var(--ink);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+  display: inline-flex;
+  align-self: center;
+  transform: rotate(-3deg);
+}
+
+.links-intro-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .links-intro-soft {
