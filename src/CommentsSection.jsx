@@ -6,19 +6,65 @@ export const COMMENTS_API_URL = 'https://sawyer-view-counter.sawyerbobk563.worke
 
 const VISIBLE_COUNT = 5
 
-// lottie.host embed for the little animation next to "Say hi". Swap the
+// Raw .lottie file for the little animation next to "Say hi" (same
+// animation as before, just pointed at the file directly instead of
+// lottie.host's /embed/ page — see EmojiWave below for why). Swap the
 // URL here if you re-export or replace the animation on lottie.host.
-const EMOJI_LOTTIE_EMBED_URL = 'https://lottie.host/embed/007801a2-c03c-47ae-acbe-3d19fa7d13a0/AcwEYzWVLg.lottie'
+const EMOJI_LOTTIE_SRC = 'https://lottie.host/007801a2-c03c-47ae-acbe-3d19fa7d13a0/AcwEYzWVLg.lottie'
+
+// CDN build of the <dotlottie-wc> web component. Loaded on demand so we
+// don't need an npm install step — just a script tag, injected once.
+const DOTLOTTIE_WC_SRC = 'https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js'
+
+let dotlottieScriptPromise = null
+function loadDotlottieScript() {
+  if (typeof window === 'undefined') return Promise.resolve()
+  if (window.customElements && window.customElements.get('dotlottie-wc')) return Promise.resolve()
+  if (!dotlottieScriptPromise) {
+    dotlottieScriptPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.type = 'module'
+      script.src = DOTLOTTIE_WC_SRC
+      script.onload = resolve
+      script.onerror = reject
+      document.head.appendChild(script)
+    })
+  }
+  return dotlottieScriptPromise
+}
 
 // Small looping animation that sits right next to the "Say hi" heading.
+// Previously an iframe pointed at lottie.host's /embed/ page — that page
+// renders its own background (which recently started showing white
+// instead of transparent) and there's no way to override it from the
+// outside since it's a separate document. Loading the .lottie file
+// directly through the <dotlottie-wc> web component instead renders
+// straight onto a canvas we control, which is transparent by default.
 function EmojiWave() {
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    loadDotlottieScript()
+      .then(() => {
+        if (!cancelled) setReady(true)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (!ready) {
+    return <span className="comments-heading-lottie" aria-hidden="true" />
+  }
+
   return (
-    <iframe
+    <dotlottie-wc
       className="comments-heading-lottie"
-      src={EMOJI_LOTTIE_EMBED_URL}
-      title=""
-      loading="lazy"
-      frameBorder="0"
+      src={EMOJI_LOTTIE_SRC}
+      autoplay
+      loop
       aria-hidden="true"
     />
   )
