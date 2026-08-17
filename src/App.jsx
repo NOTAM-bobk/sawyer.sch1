@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import CommentsSection, { CommentList, useComments } from './CommentsSection.jsx'
 import AnimalCompanion from './AnimalCompanion.jsx'
 
@@ -1259,6 +1259,96 @@ function PageSkeleton({ leaving }) {
   )
 }
 
+// -----------------------------------------------------------------------
+// Emoji rain — a one-time "you made it to the bottom" moment. A stack of
+// emoji falls in from the top, spreads out until it fills the screen,
+// holds there for a beat, then the whole stack falls away and the
+// overlay unmounts itself.
+// -----------------------------------------------------------------------
+const RAIN_EMOJIS = ['🎉', '✨', '🙌', '🔥', '💯', '🎈', '🌟', '💫', '⭐️', '😄', '🙏', '👏']
+const RAIN_COUNT = 42
+// Matches the animation-duration in .emoji-rain-piece — fall in, hold,
+// fall away — plus a little headroom before the overlay unmounts.
+const RAIN_LIFETIME_MS = 3000
+
+function EmojiRain({ active }) {
+  // Re-rolled fresh only when the rain actually fires, so re-renders
+  // while it's playing don't reshuffle everything mid-animation.
+  const particles = useMemo(() => {
+    if (!active) return []
+    return Array.from({ length: RAIN_COUNT }, (_, i) => ({
+      id: i,
+      emoji: RAIN_EMOJIS[Math.floor(Math.random() * RAIN_EMOJIS.length)],
+      left: Math.random() * 94 + 2,
+      restY: Math.random() * 84 + 4,
+      delay: Math.random() * 0.4,
+      size: 18 + Math.random() * 20,
+      rotate: Math.random() * 50 - 25,
+    }))
+  }, [active])
+
+  if (!active) return null
+
+  return (
+    <div className="emoji-rain" aria-hidden="true">
+      {particles.map((p) => (
+        <span
+          key={p.id}
+          className="emoji-rain-piece"
+          style={{
+            left: `${p.left}vw`,
+            '--rest-y': `${p.restY}vh`,
+            '--rotate': `${p.rotate}deg`,
+            animationDelay: `${p.delay}s`,
+            fontSize: `${p.size}px`,
+          }}
+        >
+          {p.emoji}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+// Invisible tripwire placed at the very bottom of the page. Fires the
+// emoji rain once, the first time it's scrolled into view.
+function EmojiRainTrigger() {
+  const ref = useRef(null)
+  const [active, setActive] = useState(false)
+
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActive(true)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0 }
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!active) return
+    const t = setTimeout(() => setActive(false), RAIN_LIFETIME_MS)
+    return () => clearTimeout(t)
+  }, [active])
+
+  return (
+    <>
+      <div ref={ref} className="emoji-rain-sentinel" aria-hidden="true" />
+      <EmojiRain active={active} />
+    </>
+  )
+}
+
 function SiteFooter() {
   return (
     <footer className="site-footer">
@@ -1533,6 +1623,7 @@ export default function App() {
             </Reveal>
 
             <SiteFooter />
+            <EmojiRainTrigger />
           </main>
 
           <Overlay type={activePanel} onClose={() => setActivePanel(null)} commentsState={commentsState} />
