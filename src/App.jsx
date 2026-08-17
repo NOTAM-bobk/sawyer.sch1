@@ -1290,23 +1290,26 @@ function EmojiRain({ active }) {
   if (!active) return null
 
   return (
-    <div className="emoji-rain" aria-hidden="true">
-      {particles.map((p) => (
-        <span
-          key={p.id}
-          className="emoji-rain-piece"
-          style={{
-            left: `${p.left}vw`,
-            '--rest-y': `${p.restY}vh`,
-            '--rotate': `${p.rotate}deg`,
-            animationDelay: `${p.delay}s`,
-            fontSize: `${p.size}px`,
-          }}
-        >
-          {p.emoji}
-        </span>
-      ))}
-    </div>
+    <>
+      <div className="emoji-rain-backdrop" aria-hidden="true" />
+      <div className="emoji-rain" aria-hidden="true">
+        {particles.map((p) => (
+          <span
+            key={p.id}
+            className="emoji-rain-piece"
+            style={{
+              left: `${p.left}vw`,
+              '--rest-y': `${p.restY}vh`,
+              '--rotate': `${p.rotate}deg`,
+              animationDelay: `${p.delay}s`,
+              fontSize: `${p.size}px`,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ))}
+      </div>
+    </>
   )
 }
 
@@ -1561,10 +1564,12 @@ export default function App() {
             </Reveal>
 
             <Reveal as="section">
+              <p className="section-kicker">PRs</p>
               <StatsRow stats={PROFILE.stats} />
             </Reveal>
 
             <Reveal as="div" className="github-block">
+              <p className="section-kicker">GitHub</p>
               <GitHubStats />
               <LanguageCarousel languages={LANGUAGES} />
             </Reveal>
