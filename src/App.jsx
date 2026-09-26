@@ -15,7 +15,7 @@ const PROFILE = {
   stats: [
     { value: '1:58', label: '800M' },
     { value: '4:28', label: '1609M' },
-    { value: '17:00', label: '5K' },
+    { value: '15:53', label: '5K' },
     { value: '??', label: 'MARATHON' },
   ],
   // Drop matching image files in /public/logos/ — see README in that folder
